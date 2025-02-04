@@ -28,6 +28,7 @@ import psycopg2
 from psycopg2.extras import execute_values
 from typing import List
 import pandas as pd
+from scipy import stats
 
 ################################################################################
 # initial parameters and setup
@@ -50,45 +51,8 @@ cluster_path = PROJECT_PATH / 'data' / '_10_clustering' / 'results.parquet'
 
 # create write paths
 trajectories_path = PROJECT_PATH / 'data' / '_11_analysis_&_conclusions' / 'trajectories.parquet'
+autoencoder_training_sample_path = PROJECT_PATH / 'data' / '_11_analysis_&_conclusions' / 'autoencoder_training_sample.parquet'
 
-# Column type definitions - primitive types for array contents
-DECIMAL_COLUMNS: set = {
-    'vertical_rates', 'ground_speeds', 'headings', 'altitudes',
-    'vertical_accels', 'ground_accels', 'turn_rates', 'climb_descent_accels'
-}
-
-INTEGER_COLUMNS: set = {
-    'point_count', 'time_offsets'
-}
-
-STRING_COLUMNS: set = {
-    'icao'
-}
-
-TIMESTAMP_COLUMNS: set = {'start_timestamp'}
-INTERVAL_COLUMNS: set = {'segment_duration'}
-
-# Columns that contain single values (not arrays)
-SINGULAR_COLUMNS: set = {
-    'segment_id',           # BIGINT
-    'icao',                 # CHAR(7)
-    'start_timestamp',      # TIMESTAMPTZ
-    'segment_duration',     # INTERVAL
-    'point_count'           # INTEGER
-}
-
-# Columns that contain arrays
-ARRAY_COLUMNS: set = {
-    'vertical_rates',         # DOUBLE PRECISION[]
-    'ground_speeds',          # DOUBLE PRECISION[]
-    'headings',               # DOUBLE PRECISION[]
-    'altitudes',              # DOUBLE PRECISION[]
-    'time_offsets',           # INTEGER[]
-    'vertical_accels',        # DOUBLE PRECISION[]
-    'ground_accels',          # DOUBLE PRECISION[]
-    'turn_rates',             # DOUBLE PRECISION[]
-    'climb_descent_accels'    # DOUBLE PRECISION[]
-}
 
 ################################################################################
 # global supporting functions
@@ -133,7 +97,7 @@ def create_db_connection(
 
 
 ################################################################################
-# data extract functions to support notebooks
+# get flight path trajectories
 ################################################################################
 
 def get_clustered_data():
@@ -154,13 +118,14 @@ def get_clustered_data():
 def get_trajectory_data(segment_ids: List[str]) -> pd.DataFrame:
     """
     Retrieves trajectory data for specified segment IDs using environment variables for DB connection
-    and saves the data to a parquet file.
+    and saves the data to a parquet file. Optimizes memory usage by assigning the most efficient
+    data types to each column.
 
     Args:
         segment_ids (List[str]): List of segment IDs to query
 
     Returns:
-        pd.DataFrame: DataFrame containing the trajectory data
+        pd.DataFrame: DataFrame containing the trajectory data with optimized dtypes
 
     Raises:
         Exception: If query execution fails or if saving to parquet fails
@@ -240,6 +205,52 @@ def get_trajectory_data(segment_ids: List[str]) -> pd.DataFrame:
         # Create DataFrame from results
         df = pd.DataFrame(results, columns=columns)
 
+        # Optimize data types for each column
+        for col in df.columns:
+            # Skip if the column is datetime or non-numeric
+            if pd.api.types.is_datetime64_any_dtype(
+                df[col]) or not pd.api.types.is_numeric_dtype(df[col]):
+                continue
+
+            # Convert to float64 first to ensure consistent handling
+            series = df[col].astype(np.float64)
+
+            # Check if all values in the column are effectively integers
+            # Using a small epsilon to account for floating point precision
+            if np.all(np.abs(series - series.round()) < 1e-10):
+                # If they are all integers, convert to the smallest integer type that can hold the data
+                min_val = series.min()
+                max_val = series.max()
+
+                if min_val >= 0:
+                    if max_val <= np.iinfo(np.uint8).max:
+                        df[col] = series.astype(np.uint8)
+                    elif max_val <= np.iinfo(np.uint16).max:
+                        df[col] = series.astype(np.uint16)
+                    elif max_val <= np.iinfo(np.uint32).max:
+                        df[col] = series.astype(np.uint32)
+                    else:
+                        df[col] = series.astype(np.uint64)
+                else:
+                    if min_val >= np.iinfo(np.int8).min and max_val <= np.iinfo(
+                        np.int8).max:
+                        df[col] = series.astype(np.int8)
+                    elif min_val >= np.iinfo(
+                        np.int16).min and max_val <= np.iinfo(np.int16).max:
+                        df[col] = series.astype(np.int16)
+                    elif min_val >= np.iinfo(
+                        np.int32).min and max_val <= np.iinfo(np.int32).max:
+                        df[col] = series.astype(np.int32)
+                    else:
+                        df[col] = series.astype(np.int64)
+            else:
+                # If they are truly floats, use float32 if precision is sufficient, otherwise float64
+                float32_series = series.astype(np.float32)
+                if np.allclose(series, float32_series, rtol=1e-7, atol=1e-14):
+                    df[col] = float32_series
+                else:
+                    df[col] = series
+
         return df
 
     except Exception as e:
@@ -251,6 +262,81 @@ def get_trajectory_data(segment_ids: List[str]) -> pd.DataFrame:
         if conn is not None:
             conn.close()
             logger.debug("Database connection closed")
+
+
+import numpy as np
+import pandas as pd
+
+
+def rotate_points(group):
+    """
+    Rotate points in a segment to align with Y-axis (90 degrees).
+    Only x and y coordinates are rotated, z remains unchanged.
+    """
+    # Target angle is 90 degrees (π/2 radians)
+    target_angle = np.pi / 2
+
+    # Calculate initial direction using first 4 points
+    first_points = group.head(4)
+    dx = first_points['x'].to_numpy()[-1] - first_points['x'].to_numpy()[0]
+    dy = first_points['y'].to_numpy()[-1] - first_points['y'].to_numpy()[0]
+    initial_angle = np.arctan2(dy, dx)
+
+    # Calculate rotation angle
+    rotation_angle = target_angle - initial_angle
+
+    # Create rotation matrix
+    cos_theta = np.cos(rotation_angle)
+    sin_theta = np.sin(rotation_angle)
+    rotation_matrix = np.array([[cos_theta, -sin_theta],
+                                [sin_theta, cos_theta]], dtype=np.float64)
+
+    # Extract points as numpy arrays
+    points = np.column_stack((
+        group['x'].to_numpy(dtype=np.float64),
+        group['y'].to_numpy(dtype=np.float64)
+    ))
+
+    # Perform rotation
+    rotated_points = points @ rotation_matrix.T
+
+    # Create new dataframe with rotated points
+    result = group.copy()
+    result['original_x'] = group['x'].to_numpy(dtype=np.float64)
+    result['original_y'] = group['y'].to_numpy(dtype=np.float64)
+    result['x'] = rotated_points[:, 0]
+    result['y'] = rotated_points[:, 1]
+    # Ensure z is proper numpy dtype but unchanged
+    result['z'] = group['z'].to_numpy(dtype=np.float64)
+
+    return result
+
+
+def rotate_trajectories(df):
+    """
+    Transform trajectory data by rotating each segment to align with Y-axis (90 degrees).
+
+    Parameters:
+    df (pandas.DataFrame): Input DataFrame with columns: segment_id, x, y, z
+
+    Returns:
+    pandas.DataFrame: Transformed DataFrame with original and rotated coordinates
+    """
+    # Convert numeric columns to proper numpy dtypes
+    df = df.copy()
+    df['x'] = df['x'].astype(np.float64)
+    df['y'] = df['y'].astype(np.float64)
+    df['z'] = df['z'].astype(np.float64)
+
+    # Apply rotation to each segment
+    rotated_df = df.groupby('segment_id', group_keys=False).apply(rotate_points)
+
+    # Verify that Z coordinates are unchanged
+    z_unchanged = np.allclose(df['z'].to_numpy(dtype=np.float64),
+                              rotated_df['z'].to_numpy(dtype=np.float64))
+    print(f"Z coordinates preserved: {z_unchanged}")
+
+    return rotated_df
 
 
 def merge_and_save_trajectories(
@@ -299,14 +385,72 @@ def merge_and_save_trajectories(
 
 
 ################################################################################
+# get sample autoencdoer_training_data
+################################################################################
+
+def get_autoencoder_training_sample(
+    sample_size: int = 100,
+    output_path: Path = autoencoder_training_sample_path
+) -> pd.DataFrame:
+    """
+    Get a random sample from autoencoder_training_unscaled table and save as parquet.
+
+    Args:
+        sample_size: Number of random samples to retrieve
+        output_path: Path to save parquet file. If None, only returns DataFrame
+
+    Returns:
+        pandas.DataFrame containing the random sample
+    """
+    query = f"""
+        SELECT *
+        FROM autoencoder_training_unscaled
+        ORDER BY RANDOM()
+        LIMIT {sample_size};
+    """
+
+    try:
+        # Create database connection
+        conn = create_db_connection()
+
+        # Use RealDictCursor so we get results as dictionaries
+        with conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+            cursor.execute(query)
+            results = cursor.fetchall()
+
+        # Convert to DataFrame
+        df = pd.DataFrame(results)
+
+        # Save to parquet if path provided
+        if output_path is not None:
+            # Ensure parent directories exist
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            df.to_parquet(output_path)
+
+    except Exception as e:
+        raise Exception(f"Error getting training sample: {str(e)}")
+
+    finally:
+        if conn:
+            conn.close()
+
+
+################################################################################
 # run
 ################################################################################
 
+# get trajectories
 clustered_df = get_clustered_data()
 
 trajectories_df = get_trajectory_data(list(clustered_df['segment_id']))
 
-merge_and_save = merge_and_save_trajectories(clustered_df, trajectories_df)
+rotated_trajectories_df = rotate_trajectories(trajectories_df)
+
+merge_and_save = merge_and_save_trajectories(clustered_df, rotated_trajectories_df)
+
+# get sample datasets
+get_autoencoder_training_sample()
 
 ################################################################################
 # main guard
