@@ -1,0 +1,466 @@
+{
+    "total_rows": 106012947,
+    "mean_point_count": 1436.9765774313792,
+    "mean_duration": {
+        "value": 591.3681333333334,
+        "units": "minutes"
+    },
+    "traves_over_15_min": 68885,
+    "null_counts": {
+        "icao": {
+            "null_count": 0,
+            "null_percentage": 0.0
+        },
+        "actual_timestamp": {
+            "null_count": 0,
+            "null_percentage": 0.0
+        },
+        "base_timestamp": {
+            "null_count": 0,
+            "null_percentage": 0.0
+        },
+        "seconds_offset": {
+            "null_count": 0,
+            "null_percentage": 0.0
+        },
+        "latitude": {
+            "null_count": 0,
+            "null_percentage": 0.0
+        },
+        "longitude": {
+            "null_count": 0,
+            "null_percentage": 0.0
+        },
+        "altitude_baro": {
+            "null_count": 169471,
+            "null_percentage": 0.16
+        },
+        "ground_speed": {
+            "null_count": 928291,
+            "null_percentage": 0.88
+        },
+        "track": {
+            "null_count": 5740441,
+            "null_percentage": 5.41
+        },
+        "flags": {
+            "null_count": 0,
+            "null_percentage": 0.0
+        },
+        "vertical_rate_baro": {
+            "null_count": 12659719,
+            "null_percentage": 11.94
+        },
+        "altitude_geom": {
+            "null_count": 16265169,
+            "null_percentage": 15.34
+        },
+        "vertical_rate_geom": {
+            "null_count": 52363303,
+            "null_percentage": 49.39
+        },
+        "indicated_airspeed": {
+            "null_count": 76158240,
+            "null_percentage": 71.84
+        },
+        "roll_angle": {
+            "null_count": 77374927,
+            "null_percentage": 72.99
+        },
+        "source_type": {
+            "null_count": 0,
+            "null_percentage": 0.0
+        },
+        "source_file_path": {
+            "null_count": 0,
+            "null_percentage": 0.0
+        },
+        "flight": {
+            "null_count": 80527271,
+            "null_percentage": 75.96
+        },
+        "squawk": {
+            "null_count": 80804778,
+            "null_percentage": 76.22
+        },
+        "category": {
+            "null_count": 80342197,
+            "null_percentage": 75.79
+        },
+        "nav_qnh": {
+            "null_count": 89675478,
+            "null_percentage": 84.59
+        },
+        "nav_altitude_mcp": {
+            "null_count": 89994428,
+            "null_percentage": 84.89
+        },
+        "nav_heading": {
+            "null_count": 96602135,
+            "null_percentage": 91.12
+        },
+        "emergency": {
+            "null_count": 83323742,
+            "null_percentage": 78.6
+        },
+        "nic": {
+            "null_count": 79474668,
+            "null_percentage": 74.97
+        },
+        "rc": {
+            "null_count": 79474668,
+            "null_percentage": 74.97
+        },
+        "version": {
+            "null_count": 81072294,
+            "null_percentage": 76.47
+        },
+        "nic_baro": {
+            "null_count": 84900087,
+            "null_percentage": 80.08
+        },
+        "nac_p": {
+            "null_count": 81176967,
+            "null_percentage": 76.57
+        },
+        "nac_v": {
+            "null_count": 81142798,
+            "null_percentage": 76.54
+        },
+        "sil": {
+            "null_count": 81176967,
+            "null_percentage": 76.57
+        },
+        "sil_type": {
+            "null_count": 80607579,
+            "null_percentage": 76.04
+        },
+        "gva": {
+            "null_count": 85316951,
+            "null_percentage": 80.48
+        },
+        "sda": {
+            "null_count": 82688535,
+            "null_percentage": 78.0
+        }
+    },
+    "distinct_counts": {
+        "icao": {
+            "distinct_count": 73775,
+            "distinct_percentage": 0.07
+        },
+        "actual_timestamp": {
+            "distinct_count": 7477602,
+            "distinct_percentage": 7.05
+        },
+        "base_timestamp": {
+            "distinct_count": 1,
+            "distinct_percentage": 0.0
+        },
+        "seconds_offset": {
+            "distinct_count": 7477602,
+            "distinct_percentage": 7.05
+        },
+        "latitude": {
+            "distinct_count": 7946936,
+            "distinct_percentage": 7.5
+        },
+        "longitude": {
+            "distinct_count": 27078173,
+            "distinct_percentage": 25.54
+        },
+        "altitude_baro": {
+            "distinct_count": 3100,
+            "distinct_percentage": 0.0
+        },
+        "ground_speed": {
+            "distinct_count": 10504,
+            "distinct_percentage": 0.01
+        },
+        "track": {
+            "distinct_count": 3601,
+            "distinct_percentage": 0.0
+        },
+        "flags": {
+            "distinct_count": 16,
+            "distinct_percentage": 0.0
+        },
+        "vertical_rate_baro": {
+            "distinct_count": 3863,
+            "distinct_percentage": 0.0
+        },
+        "altitude_geom": {
+            "distinct_count": 3260,
+            "distinct_percentage": 0.0
+        },
+        "vertical_rate_geom": {
+            "distinct_count": 1199,
+            "distinct_percentage": 0.0
+        },
+        "indicated_airspeed": {
+            "distinct_count": 753,
+            "distinct_percentage": 0.0
+        },
+        "roll_angle": {
+            "distinct_count": 241,
+            "distinct_percentage": 0.0
+        },
+        "source_type": {
+            "distinct_count": 7,
+            "distinct_percentage": 0.0
+        },
+        "source_file_path": {
+            "distinct_count": 73775,
+            "distinct_percentage": 0.07
+        },
+        "flight": {
+            "distinct_count": 141395,
+            "distinct_percentage": 0.13
+        },
+        "squawk": {
+            "distinct_count": 4092,
+            "distinct_percentage": 0.0
+        },
+        "category": {
+            "distinct_count": 30,
+            "distinct_percentage": 0.0
+        },
+        "nav_qnh": {
+            "distinct_count": 599,
+            "distinct_percentage": 0.0
+        },
+        "nav_altitude_mcp": {
+            "distinct_count": 1957,
+            "distinct_percentage": 0.0
+        },
+        "nav_heading": {
+            "distinct_count": 880,
+            "distinct_percentage": 0.0
+        },
+        "emergency": {
+            "distinct_count": 8,
+            "distinct_percentage": 0.0
+        },
+        "nic": {
+            "distinct_count": 12,
+            "distinct_percentage": 0.0
+        },
+        "rc": {
+            "distinct_count": 15,
+            "distinct_percentage": 0.0
+        },
+        "version": {
+            "distinct_count": 8,
+            "distinct_percentage": 0.0
+        },
+        "nic_baro": {
+            "distinct_count": 2,
+            "distinct_percentage": 0.0
+        },
+        "nac_p": {
+            "distinct_count": 15,
+            "distinct_percentage": 0.0
+        },
+        "nac_v": {
+            "distinct_count": 8,
+            "distinct_percentage": 0.0
+        },
+        "sil": {
+            "distinct_count": 4,
+            "distinct_percentage": 0.0
+        },
+        "sil_type": {
+            "distinct_count": 3,
+            "distinct_percentage": 0.0
+        },
+        "gva": {
+            "distinct_count": 4,
+            "distinct_percentage": 0.0
+        },
+        "sda": {
+            "distinct_count": 4,
+            "distinct_percentage": 0.0
+        }
+    },
+    "distinct_values": {
+        "base_timestamp": [
+            1722470400
+        ],
+        "flags": [
+            5,
+            9,
+            14,
+            2,
+            10,
+            0,
+            11,
+            15,
+            4,
+            1,
+            3,
+            12,
+            6,
+            8,
+            7,
+            13
+        ],
+        "source_type": [
+            "adsr_icao",
+            "adsc",
+            "other",
+            "tisb_icao",
+            "adsb_icao",
+            "adsb_icao_nt",
+            "mlat"
+        ],
+        "category": [
+            "B2",
+            "A3",
+            "A7",
+            "C2",
+            "C0",
+            "C6",
+            "A4",
+            "C1",
+            "C3",
+            "B3",
+            "D5",
+            "A2",
+            "C7",
+            "D2",
+            null,
+            "B0",
+            "B1",
+            "D7",
+            "A1",
+            "A5",
+            "D4",
+            "D0",
+            "B5",
+            "B7",
+            "A0",
+            "B4",
+            "C4",
+            "A6",
+            "B6",
+            "D1",
+            "D6"
+        ],
+        "emergency": [
+            null,
+            "general",
+            "lifeguard",
+            "downed",
+            "reserved",
+            "none",
+            "unlawful",
+            "minfuel",
+            "nordo"
+        ],
+        "nic": [
+            null,
+            9,
+            5,
+            4,
+            0,
+            11,
+            6,
+            3,
+            1,
+            2,
+            10,
+            8,
+            7
+        ],
+        "rc": [
+            186,
+            926,
+            1852,
+            0,
+            14816,
+            7408,
+            null,
+            556,
+            18520,
+            75,
+            371,
+            8,
+            3704,
+            1112,
+            37040,
+            25
+        ],
+        "version": [
+            4,
+            5,
+            0,
+            6,
+            3,
+            2,
+            1,
+            null,
+            7
+        ],
+        "nic_baro": [
+            0,
+            null,
+            1
+        ],
+        "nac_p": [
+            6,
+            3,
+            12,
+            8,
+            7,
+            13,
+            null,
+            9,
+            5,
+            14,
+            4,
+            0,
+            11,
+            10,
+            2,
+            1
+        ],
+        "nac_v": [
+            7,
+            0,
+            5,
+            null,
+            3,
+            6,
+            2,
+            1,
+            4
+        ],
+        "sil": [
+            2,
+            1,
+            0,
+            null,
+            3
+        ],
+        "sil_type": [
+            null,
+            "unknown",
+            "perhour",
+            "persample"
+        ],
+        "gva": [
+            3,
+            0,
+            2,
+            null,
+            1
+        ],
+        "sda": [
+            null,
+            2,
+            1,
+            0,
+            3
+        ]
+    }
+}

@@ -1,0 +1,33 @@
+DROP TABLE IF EXISTS autoencoder_training_data;
+
+CREATE TABLE autoencoder_training_data (
+    icao VARCHAR(7),
+    start_timestamp TIMESTAMP WITH TIME ZONE,
+    altitude_mean DOUBLE PRECISION,
+    altitude_std DOUBLE PRECISION,
+    altitude_min INTEGER,
+    altitude_max INTEGER,
+    altitude_median DOUBLE PRECISION,
+    speed_mean DOUBLE PRECISION,
+    speed_std DOUBLE PRECISION,
+    speed_min DOUBLE PRECISION,
+    speed_max DOUBLE PRECISION,
+    speed_median DOUBLE PRECISION,
+    vertical_rate_mean DOUBLE PRECISION,
+    vertical_rate_std DOUBLE PRECISION,
+    vertical_rate_min INTEGER,
+    vertical_rate_max INTEGER,
+    vertical_rate_median DOUBLE PRECISION,
+    latitude_mean DOUBLE PRECISION,
+    latitude_std DOUBLE PRECISION,
+    latitude_min DOUBLE PRECISION,
+    latitude_max DOUBLE PRECISION,
+    latitude_median DOUBLE PRECISION,
+    longitude_mean DOUBLE PRECISION,
+    longitude_std DOUBLE PRECISION,
+    longitude_min DOUBLE PRECISION,
+    longitude_max DOUBLE PRECISION,
+    longitude_median DOUBLE PRECISION,
+    duration INTERVAL,
+    PRIMARY KEY (icao, start_timestamp)
+);

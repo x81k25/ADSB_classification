@@ -1,0 +1,37 @@
+# PyTorch install
+--index-url https://download.pytorch.org/whl/cu118
+torch
+
+# pip installs for scripts
+--index-url https://pypi.org/simple
+aiohttp
+asyncio
+beautifulsoup4
+duckdb
+duckdb-engine
+hdbscan
+Jinja2
+matplotlib
+pandas
+psutil
+python-dotenv
+requests
+psycopg2-binary
+scikit-learn
+torch-geometric
+tqdm
+
+# pip isntall for notebooks
+cartopy
+ipykernel
+ipywidgets
+jupyter
+jupyter_contrib_nbextensions
+jupyterlab
+kaleido
+matplotlib
+nbconvert
+nbformat
+pyarrow
+plotly
+seaborn
