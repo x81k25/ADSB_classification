@@ -4,13 +4,23 @@ This project implements an end-to-end data pipeline for analyzing and classifyin
 
 ## Project Overview
 
-The project consists of multiple components:
-- Data collection through web scraping
-- Data storage and processing using PostgreSQL
-- Feature engineering and preprocessing
-- Dimensionality reduction using autoencoder neural networks
-- Clustering analysis using HDBSCAN
-- Classification and regression modeling for cluster validation
+Hello, I'm so excited for you to be looking at my project! Let me show you around.
+
+If you want to get a high level overview, you're in the right place, just keep reading.
+
+If you want to get a deeper understanding of the project then what is here, then you can jump straight to the notebooks by following these links: 
+- https://x81k25.github.io/ADSB_classification/blob/main/docs/01_data_engineering_EDA.html
+- https://x81k25.github.io/ADSB_classification/blob/main/docs/02_feature_engineering.html
+- https://x81k25.github.io/ADSB_classification/blob/main/docs/03_ML_pipeline.html
+- https://x81k25.github.io/ADSB_classification/blob/main/docs/04_analysis_conclusions.html
+ 
+Oh, that's not enough, you want to run the notebooks yourself? If you are accessing the file from github, the full repo can be found here:
+
+- https://github.com/x81k25/ADSB_classification
+
+Just clone the repo and get going. Everything for the notebooks is in here.
+
+If you still want to get deeper and fully recreate this project, then keep reading. The requirements to run the full project are detailed below.
 
 ## Repository Structure
 
@@ -39,6 +49,12 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```bash 
 pip install -r requirements.txt
 ```
+
+Notes on requirements:
+- currently requirements.txt contains all packages to run all portions of the project
+- the requirements.txt is broken down into dependencies for the scripts and notebooks separately but some of the scripts requirements are also required for the notebooks
+- if you have no plan to run PyTorch with GPU acceleration, you should be able to delete the pytorch section of the requirements.txt and do a standard pip install of the torch package
+  - i have not tested this method, but all code is written to fall back to CPU if the GPU requirements are not detected
 
 4. Register venv as ipykernel:
 

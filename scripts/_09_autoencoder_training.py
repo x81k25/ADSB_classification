@@ -580,7 +580,7 @@ if __name__ == "__main__":
         description='Train autoencoder on flight data')
     parser.add_argument('--test', '-t', action='store_true',
                         help='Run in test mode with debug logging')
-    parser.add_argument('--max_sample_size', type=int, default=100000,
+    parser.add_argument('--max_sample_size', type=int, default=1000000,
                         help='Run in test mode with debug logging')
     parser.add_argument('--epochs', type=int, default=50,
                         help='Number of training epochs')
