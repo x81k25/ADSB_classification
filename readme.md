@@ -65,10 +65,6 @@ Notes on requirements:
 python -m ipykernel install --user --name=venv --display-name=ADSB_classification
 ```
 
-## Conclusions and Results
-
-TBA
-
 ## Methodology
 
 ### Problem Statement
@@ -194,7 +190,7 @@ Here I store the data required for the execution of the jupyter notebooks. The e
 
 Okay, if you really want all of the data, you recreate it entirely yourself. First, clear your schedule for a day or two, then go the Scripts section of the readme and follow the instructions.
 
-### data
+### docs
 
 This directory simply holds all of the assets required to view the repo via Github Pages. The .ipynb files are convert to html via nbconvert. Directory also contains the html/javascript versions of the more complex plots.
 
@@ -202,6 +198,7 @@ This directory simply holds all of the assets required to view the repo via Gith
 
 - detailed commentary on process and methods chosen
 - summaries of all of the processes completed in the scripts
+- model analysis
 - model analysis
 - conclusions drawn from analysis
 - some cool visualizations
@@ -215,8 +212,8 @@ Here is where the vast majority of the code for this projects lives. If you real
 #### Setup
 
 - you will need a PostgreSQL database with around 15Gb of storage available
-  - I am using a PostgreSQL databse running on a local server in a docker container, which is to say you will not need the beefiest PosgreSQL instance, but you're going to need a few cores and at least 4Gb of memory allocated
-  - you will also need to have permissions to create tables and insert data in this databsae
+  - I am using a PostgreSQL database running on a local server in a docker container, which is to say you will not need the beefiest PosgreSQL instance, but you're going to need a few cores and at least 4Gb of memory allocated
+  - you will also need to have permissions to create tables and insert data in this database
   - all of the scripts needed to create the tables are in the sql folder
     - run every sql script in the sql folder
     - they can be executed in any order, as no foreign keys were implemented
