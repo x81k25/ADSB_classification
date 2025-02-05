@@ -322,6 +322,18 @@ Note on script contents: Scripts _01 -> _03 are not necessary to run the followi
  - Configurable parameters include minimum cluster size and epsilon
  - Analyzes cluster characteristics including average altitude, speed, vertical rate, and duration"""
 
+- _10_clustering.py 
+ - Performs flight pattern clustering using HDBSCAN algorithm
+ - Workflow: data loading from pickle file, preprocessing (outlier removal using z-scores and scaling), and clustering
+ - Configurable parameters include minimum cluster size and epsilon
+ - Analyzes cluster characteristics including average altitude, speed, vertical rate, and duration"""
+
+- _11_analysis_conclusions.py
+ - No actual analysis is done in this script; but you guessed it, we're doing more data prep!
+ - This script contains several functions designed to transform and format data so it can properly ingested by notebooks
+ - The first major series of functions converts the segments to plotting and assigned all relevant analysis fields
+ - Other functions grab data that is too big to be stored in the repo and creates subsets which can be read by the notebooks
+
 ### sql
 
 The SQL scripts contained are required only to run the scripts in this repo; the notebooks only need what is already in the data folder; so if your only doing the notebooks you can skip this. As per the instructions in the scripts sections above, run all fo the scripts in this folder to create the necessary tables. They can be run in any order.
