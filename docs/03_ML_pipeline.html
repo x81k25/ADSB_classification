@@ -7693,7 +7693,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># import dependencies </span>
@@ -7712,6 +7712,83 @@ a.anchor-link {
 <span class="c1"># Add Autoencoder to safe globals</span>
 <span class="n">add_safe_globals</span><span class="p">([</span><span class="n">Autoencoder</span><span class="p">])</span>
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">from</span> <span class="nn">plotly.offline</span> <span class="kn">import</span> <span class="n">init_notebook_mode</span><span class="p">,</span> <span class="n">plot</span>
+
+<span class="c1"># This ensures plots work in the notebook</span>
+<span class="n">init_notebook_mode</span><span class="p">(</span><span class="n">connected</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Create a simple scatter plot</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">]))</span>
+
+<span class="c1"># Update layout</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'Test Plot'</span><span class="p">,</span> 
+                 <span class="n">xaxis_title</span><span class="o">=</span><span class="s1">'X Axis'</span><span class="p">,</span>
+                 <span class="n">yaxis_title</span><span class="o">=</span><span class="s1">'Y Axis'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot with embedded JavaScript</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">include_plotlyjs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+         <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s1">'displayModeBar'</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<script type="text/javascript">
+        window.PlotlyConfig = {MathJaxConfig: 'local'};
+        if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}
+        </script>
+<script type="module">import "https://cdn.plot.ly/plotly-3.0.0.min"</script>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div> <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG"></script><script type="text/javascript">if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}</script> <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+<script charset="utf-8" src="https://cdn.plot.ly/plotly-3.0.0.min.js"></script> <div class="plotly-graph-div" id="95020951-f916-4613-9f91-d8722c00851c" style="height:525px; width:100%;"></div> <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("95020951-f916-4613-9f91-d8722c00851c")) {                    Plotly.newPlot(                        "95020951-f916-4613-9f91-d8722c00851c",                        [{"x":[1,2,3,4],"y":[10,11,12,13],"type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"text":"Test Plot"},"xaxis":{"title":{"text":"X Axis"}},"yaxis":{"title":{"text":"Y Axis"}}},                        {"displayModeBar": true, "responsive": true}                    ).then(function(){
+                            
+var gd = document.getElementById('95020951-f916-4613-9f91-d8722c00851c');
+var x = new MutationObserver(function (mutations, observer) {{
+        var display = window.getComputedStyle(gd).display;
+        if (!display || display === 'none') {{
+            console.log([gd, 'removed!']);
+            Plotly.purge(gd);
+            observer.disconnect();
+        }}
+}});
+
+// Listen for the removal of the full notebook cells
+var notebookContainer = gd.closest('#notebook-container');
+if (notebookContainer) {{
+    x.observe(notebookContainer, {childList: true});
+}}
+
+// Listen for the clearing of the current output cell
+var outputEl = gd.closest('.output');
+if (outputEl) {{
+    x.observe(outputEl, {childList: true});
+}}
+
+                        })                };            </script> </div>
 </div>
 </div>
 </div>
@@ -7797,7 +7874,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Load the model</span>
@@ -7908,10 +7985,10 @@ Shape: [256, 450]
 Parameters: 115,200
 Data Type: torch.float32
 Weight Stats:
-  Mean: 0.0097
-  Std: 0.2057
-  Min: -1.8087
-  Max: 1.7435
+  Mean: 0.0235
+  Std: 0.3674
+  Min: -4.4464
+  Max: 4.1463
 
 Layer: encoder.0.bias
 Shape: [256]
@@ -7923,10 +8000,10 @@ Shape: [128, 256]
 Parameters: 32,768
 Data Type: torch.float32
 Weight Stats:
-  Mean: -0.0513
-  Std: 0.1454
-  Min: -0.8267
-  Max: 0.7044
+  Mean: -0.0941
+  Std: 0.2647
+  Min: -4.2953
+  Max: 2.1230
 
 Layer: encoder.2.bias
 Shape: [128]
@@ -7938,10 +8015,10 @@ Shape: [64, 128]
 Parameters: 8,192
 Data Type: torch.float32
 Weight Stats:
-  Mean: -0.0302
-  Std: 0.1071
-  Min: -0.7644
-  Max: 0.5806
+  Mean: -0.0445
+  Std: 0.1346
+  Min: -0.9577
+  Max: 0.8867
 
 Layer: encoder.4.bias
 Shape: [64]
@@ -7953,10 +8030,10 @@ Shape: [32, 64]
 Parameters: 2,048
 Data Type: torch.float32
 Weight Stats:
-  Mean: -0.0217
-  Std: 0.1078
-  Min: -0.6463
-  Max: 0.3901
+  Mean: -0.0312
+  Std: 0.1620
+  Min: -0.7805
+  Max: 1.3526
 
 Layer: encoder.6.bias
 Shape: [32]
@@ -7968,10 +8045,10 @@ Shape: [64, 32]
 Parameters: 2,048
 Data Type: torch.float32
 Weight Stats:
-  Mean: -0.0439
-  Std: 0.1409
-  Min: -1.3642
-  Max: 0.4248
+  Mean: -0.0562
+  Std: 0.1430
+  Min: -1.2951
+  Max: 0.4102
 
 Layer: decoder.0.bias
 Shape: [64]
@@ -7983,10 +8060,10 @@ Shape: [128, 64]
 Parameters: 8,192
 Data Type: torch.float32
 Weight Stats:
-  Mean: -0.0504
-  Std: 0.1603
-  Min: -1.3051
-  Max: 0.6309
+  Mean: -0.0449
+  Std: 0.1388
+  Min: -1.5799
+  Max: 0.6840
 
 Layer: decoder.2.bias
 Shape: [128]
@@ -7998,10 +8075,10 @@ Shape: [256, 128]
 Parameters: 32,768
 Data Type: torch.float32
 Weight Stats:
-  Mean: -0.0815
-  Std: 0.2133
-  Min: -2.3098
-  Max: 0.7473
+  Mean: -0.0865
+  Std: 0.3414
+  Min: -10.1759
+  Max: 1.5157
 
 Layer: decoder.4.bias
 Shape: [256]
@@ -8013,10 +8090,10 @@ Shape: [450, 256]
 Parameters: 115,200
 Data Type: torch.float32
 Weight Stats:
-  Mean: -0.0003
-  Std: 0.1116
-  Min: -2.5216
-  Max: 2.0596
+  Mean: 0.0001
+  Std: 0.1172
+  Min: -4.1823
+  Max: 3.5634
 
 Layer: decoder.6.bias
 Shape: [450]
@@ -8035,7 +8112,7 @@ Model Device(s): {device(type='cpu')}
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Add this after loading the model</span>
@@ -8053,7 +8130,7 @@ Model Device(s): {device(type='cpu')}
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1">#### Examine outputs</span>
@@ -8076,7 +8153,7 @@ Model Device(s): {device(type='cpu')}
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>number of rows: 500000
+<pre>number of rows: 1000000
 </pre>
 </div>
 </div>
@@ -8127,123 +8204,123 @@ Model Device(s): {device(type='cpu')}
 <tbody>
 <tr>
 <th>0</th>
-<td>0.003249</td>
-<td>-194.753464</td>
-<td>39.172405</td>
-<td>102.235229</td>
-<td>5805.725098</td>
-<td>-20.660242</td>
-<td>0.099267</td>
-<td>-3.001445</td>
-<td>-5.914703</td>
-<td>-1.575811e+05</td>
+<td>0.021274</td>
+<td>-2391.272217</td>
+<td>426.204803</td>
+<td>256.997345</td>
+<td>26619.986328</td>
+<td>-26.189440</td>
+<td>0.015159</td>
+<td>0.608051</td>
+<td>-103.790306</td>
+<td>9.001877e+06</td>
 <td>...</td>
-<td>334734656.0</td>
-<td>278.363922</td>
-<td>47.095573</td>
-<td>105.978432</td>
-<td>5417.202148</td>
-<td>9.499974</td>
-<td>0.378828</td>
-<td>0.624043</td>
-<td>53.156960</td>
-<td>41</td>
+<td>400537216.0</td>
+<td>-1286.003540</td>
+<td>311.033478</td>
+<td>280.729126</td>
+<td>11123.783203</td>
+<td>-0.198297</td>
+<td>-0.271256</td>
+<td>0.385261</td>
+<td>17.207180</td>
+<td>8776640</td>
 </tr>
 <tr>
 <th>1</th>
-<td>0.000323</td>
-<td>353.239746</td>
-<td>82.941017</td>
-<td>183.531342</td>
-<td>765.000671</td>
-<td>-10.215487</td>
-<td>-0.202588</td>
-<td>-0.038283</td>
-<td>95.690521</td>
-<td>9.211649e+05</td>
+<td>-0.027585</td>
+<td>1309.264160</td>
+<td>429.967102</td>
+<td>16.964352</td>
+<td>21088.099609</td>
+<td>41.075996</td>
+<td>-0.209062</td>
+<td>0.446521</td>
+<td>-16.958027</td>
+<td>1.199074e+07</td>
 <td>...</td>
-<td>298963424.0</td>
-<td>617.573059</td>
-<td>92.789986</td>
-<td>185.047852</td>
-<td>3788.782227</td>
-<td>8.571080</td>
-<td>0.159375</td>
-<td>0.336083</td>
-<td>-14.941891</td>
-<td>42</td>
+<td>750325632.0</td>
+<td>-928.983521</td>
+<td>456.485596</td>
+<td>-3.226900</td>
+<td>21995.623047</td>
+<td>21.134535</td>
+<td>0.320871</td>
+<td>0.253475</td>
+<td>-171.810287</td>
+<td>9406275</td>
 </tr>
 <tr>
 <th>2</th>
-<td>0.002048</td>
-<td>-839.368225</td>
-<td>102.746986</td>
-<td>174.435715</td>
-<td>5920.828613</td>
-<td>-42.120750</td>
-<td>-0.447311</td>
-<td>-0.325613</td>
-<td>197.757874</td>
-<td>2.861461e+06</td>
+<td>0.010562</td>
+<td>1091.447266</td>
+<td>189.254166</td>
+<td>222.599243</td>
+<td>-3218.409912</td>
+<td>22.040821</td>
+<td>0.470975</td>
+<td>0.090995</td>
+<td>-63.672363</td>
+<td>1.804085e+06</td>
 <td>...</td>
-<td>623542208.0</td>
-<td>-107.692612</td>
-<td>107.506813</td>
-<td>86.558212</td>
-<td>8350.167969</td>
-<td>34.876686</td>
-<td>-0.108917</td>
-<td>0.310067</td>
-<td>2.819789</td>
-<td>43</td>
+<td>148401136.0</td>
+<td>1923.508545</td>
+<td>256.459290</td>
+<td>215.714081</td>
+<td>8521.358398</td>
+<td>-7.209484</td>
+<td>-0.086521</td>
+<td>-0.333846</td>
+<td>-47.320778</td>
+<td>9304767</td>
 </tr>
 <tr>
 <th>3</th>
-<td>0.080986</td>
-<td>-245.742477</td>
-<td>35.907604</td>
-<td>150.459732</td>
-<td>-3655.069580</td>
-<td>22.759470</td>
-<td>3.707922</td>
-<td>-5.650629</td>
-<td>-291.920990</td>
-<td>4.334255e+06</td>
+<td>-0.000463</td>
+<td>95.263321</td>
+<td>462.243134</td>
+<td>155.262802</td>
+<td>34844.378906</td>
+<td>-25.224617</td>
+<td>-0.066722</td>
+<td>0.203521</td>
+<td>26.105040</td>
+<td>1.976829e+07</td>
 <td>...</td>
-<td>139311552.0</td>
-<td>-352.491455</td>
-<td>64.995964</td>
-<td>210.842209</td>
-<td>-1511.794067</td>
-<td>117.812836</td>
-<td>3.094412</td>
-<td>2.737144</td>
-<td>576.685974</td>
-<td>49</td>
+<td>806281152.0</td>
+<td>-296.389709</td>
+<td>454.934967</td>
+<td>145.074097</td>
+<td>32942.191406</td>
+<td>-17.680965</td>
+<td>-0.037470</td>
+<td>-0.131092</td>
+<td>-71.101250</td>
+<td>8865567</td>
 </tr>
 <tr>
 <th>4</th>
-<td>-0.000017</td>
-<td>1840.732788</td>
-<td>175.758682</td>
-<td>106.235802</td>
-<td>-1833.489624</td>
-<td>7.651904</td>
-<td>-0.230574</td>
-<td>0.542463</td>
-<td>69.710579</td>
-<td>6.763514e+06</td>
+<td>0.010340</td>
+<td>36.086594</td>
+<td>98.401344</td>
+<td>8.072521</td>
+<td>1492.007935</td>
+<td>-9.836600</td>
+<td>-0.388105</td>
+<td>0.385285</td>
+<td>10.416059</td>
+<td>1.311079e+07</td>
 <td>...</td>
-<td>449997088.0</td>
-<td>881.147522</td>
-<td>239.831268</td>
-<td>81.942581</td>
-<td>8838.738281</td>
-<td>-3.041011</td>
-<td>-0.087853</td>
-<td>-0.047618</td>
-<td>5.304020</td>
-<td>44</td>
+<td>431435712.0</td>
+<td>-88.692192</td>
+<td>92.438080</td>
+<td>128.219528</td>
+<td>1321.861450</td>
+<td>-11.151931</td>
+<td>0.025553</td>
+<td>0.035737</td>
+<td>-127.268661</td>
+<td>11002401</td>
 </tr>
 </tbody>
 </table>
@@ -8343,7 +8420,7 @@ Model Device(s): {device(type='cpu')}
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
@@ -8383,47 +8460,49 @@ Model Device(s): {device(type='cpu')}
 Min Cluster Size: 10
 Cluster Selection Method: eom
 
-Number of clusters: 19
-Number of noise points: 429
-Total points: 897
+Number of clusters: 20
+Number of noise points: 337
+Total points: 860
 
-Cluster 0 size: 21
+Cluster 0 size: 15
 
-Cluster 1 size: 26
+Cluster 1 size: 41
 
-Cluster 2 size: 10
+Cluster 2 size: 29
 
-Cluster 3 size: 51
+Cluster 3 size: 33
 
-Cluster 4 size: 18
+Cluster 4 size: 17
 
-Cluster 5 size: 66
+Cluster 5 size: 27
 
-Cluster 6 size: 10
+Cluster 6 size: 13
 
-Cluster 7 size: 11
+Cluster 7 size: 10
 
 Cluster 8 size: 14
 
-Cluster 9 size: 38
+Cluster 9 size: 20
 
-Cluster 10 size: 12
+Cluster 10 size: 30
 
-Cluster 11 size: 30
+Cluster 11 size: 15
 
-Cluster 12 size: 12
+Cluster 12 size: 25
 
-Cluster 13 size: 11
+Cluster 13 size: 16
 
-Cluster 14 size: 33
+Cluster 14 size: 11
 
-Cluster 15 size: 10
+Cluster 15 size: 18
 
-Cluster 16 size: 22
+Cluster 16 size: 15
 
-Cluster 17 size: 50
+Cluster 17 size: 11
 
-Cluster 18 size: 23
+Cluster 18 size: 36
+
+Cluster 19 size: 127
 </pre>
 </div>
 </div>
@@ -8434,7 +8513,7 @@ Cluster 18 size: 23
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1">#### Examine outputs</span>
@@ -8457,7 +8536,7 @@ Cluster 18 size: 23
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>number of rows: 905
+<pre>number of rows: 21399
 </pre>
 </div>
 </div>
@@ -8495,33 +8574,33 @@ Cluster 18 size: 23
 </thead>
 <tbody>
 <tr>
-<th>1005979</th>
+<th>10648263</th>
 <td>0</td>
 <td>False</td>
 <td>False</td>
 </tr>
 <tr>
-<th>798976</th>
+<th>9437118</th>
 <td>-1</td>
 <td>False</td>
 <td>False</td>
 </tr>
 <tr>
-<th>63592</th>
-<td>10</td>
+<th>10669532</th>
+<td>0</td>
 <td>False</td>
 <td>False</td>
 </tr>
 <tr>
-<th>816894</th>
-<td>10</td>
+<th>10601579</th>
+<td>0</td>
 <td>False</td>
 <td>False</td>
 </tr>
 <tr>
-<th>1020484</th>
-<td>10</td>
-<td>True</td>
+<th>11968445</th>
+<td>0</td>
+<td>False</td>
 <td>False</td>
 </tr>
 </tbody>
