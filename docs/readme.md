@@ -204,6 +204,8 @@ This directory simply holds all of the assets required to view the repo via Gith
 - conclusions drawn from analysis
 - some cool visualizations
 
+Note: You might notice it looks like some of the plots are printed twice in plotly. This is for compatibility reasons. Dynamic plotly plots are rendered for use with appropriate notebook environment. Static plots are printed to for support on Github Pages for examples. In some environments you will see both plots, just choose to look at the version you like better! 
+
 ### scripts
 
 Here is where the vast majority of the code for this projects lives. If you really want to recreate all the steps I did with the full data set, everything you need is in here. Several steps will need to be conducted before the scripts can be initiated.
