@@ -44,14 +44,14 @@ load_dotenv()
 # create file paths
 PROJECT_PATH = Path(os.getenv("PROJECT_PATH"))
 
-# create read praths
+# create read paths
 input_data_path = PROJECT_PATH / 'data' / '_09_autoencoder_training' / 'results.parquet'
 
 # create write paths
 model_path = PROJECT_PATH / 'data' / '_10_clustering' / 'model.pkl'
 data_path = PROJECT_PATH / 'data' / '_10_clustering' / 'results.parquet'
 
-# suppress depraction warnings
+# suppress deprecation warnings
 warnings.simplefilter('ignore', FutureWarning)
 
 ################################################################################
