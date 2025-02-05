@@ -7693,7 +7693,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># import dependencies </span>
@@ -7701,6 +7701,8 @@ a.anchor-link {
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>  
 <span class="kn">import</span> <span class="nn">IPython.core.getipython</span> <span class="k">as</span> <span class="nn">getipython</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch.serialization</span> <span class="kn">import</span> <span class="n">add_safe_globals</span>
@@ -7723,69 +7725,54 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Hyperparmeter-Selection">Hyperparmeter Selection<a class="anchor-link" href="#Hyperparmeter-Selection">¶</a></h3><h4 id="Autoencoder">Autoencoder<a class="anchor-link" href="#Autoencoder">¶</a></h4><p>Hyperparemeters chosen:</p>
+<h3 id="Autoencoder">Autoencoder<a class="anchor-link" href="#Autoencoder">¶</a></h3><h4 id="Hyperparameter-Selection">Hyperparameter Selection<a class="anchor-link" href="#Hyperparameter-Selection">¶</a></h4><ul>
+<li><p>Input Structure (450 dimensions)</p>
 <ul>
-<li><p>Encoding Dimension (10)</p>
+<li>Represents 9 flight features sampled at 50 timepoints</li>
+<li>Creates temporal sequence for pattern learning</li>
+<li>Requires deeper architecture versus point-in-time features</li>
+</ul>
+</li>
+<li><p>Network Width (256 → 128 → 64 → 32)</p>
 <ul>
-<li>Implements 3:1 compression ratio from ~30 input features</li>
-<li>Forces autoencoder to learn salient flight patterns while discarding noise</li>
-<li>Provides sufficient dimensions to encode standard flight phases while retaining capacity for pattern variations</li>
+<li>Progressive quartering preserves temporal relationships</li>
+<li>Width accommodates complex time-series patterns</li>
+<li>Prevents information bottlenecks across 450-dimensional input</li>
+</ul>
+</li>
+<li><p>ReLU Activation Functions</p>
+<ul>
+<li>Mitigates vanishing gradients across deep architecture</li>
+<li>Enhances learning of temporal patterns</li>
+<li>Maintains non-linearity without sigmoid saturation issues</li>
+</ul>
+</li>
+<li><p>Encoding Dimension (32)</p>
+<ul>
+<li>Implements ~14:1 compression ratio from 450 input features</li>
+<li>Maintains capacity for temporal pattern variations</li>
+<li>Balances compression against reconstruction accuracy</li>
 </ul>
 </li>
 <li><p>Batch Size (32)</p>
 <ul>
-<li>Optimizes GPU memory utilization within 12GB constraint</li>
-<li>Maintains training stability through adequate batch size</li>
-<li>Ensures sufficient sample diversity for flight pattern capture</li>
+<li>Ensures stable gradient updates for temporal sequences</li>
+<li>Optimizes 32GB memory constraint</li>
+<li>Maintains temporal diversity within batches</li>
 </ul>
 </li>
-<li><p>Network Width Progression (32 → 16 → 10)</p>
+<li><p>Training Parameters</p>
 <ul>
-<li>Initial width accommodates ~30 dimensional input space</li>
-<li>Progressive halving prevents information bottlenecks</li>
-<li>Creates efficient information funnel for dimensionality reduction</li>
+<li>100k random samples from full dataset</li>
+<li>60-minute training window with GPU acceleration</li>
+<li>Memory-constrained sample size enables efficient iteration</li>
 </ul>
 </li>
-<li><p>Epochs (50)</p>
+<li><p>Training Convergence</p>
 <ul>
-<li>Appropriate iteration count for 100k sample dataset</li>
-<li>Achieves convergence within 10 minute training window</li>
-<li>Balances pattern learning against overfitting risk given architecture simplicity</li>
-</ul>
-</li>
-</ul>
-<p>Potential options for future research:</p>
-<ul>
-<li><p>Encoding Dimension (currently 10)</p>
-<ul>
-<li>Try values: [8, 12, 15]</li>
-<li>Higher dimensions could capture more nuanced flight patterns</li>
-<li>Still maintains efficient compression ratio (2:1 at maximum)</li>
-<li>Worth testing first as most impactful parameter</li>
-</ul>
-</li>
-<li><p>Network Width Progression (currently 32 → 16 → 10)</p>
-<ul>
-<li>Try values: [64 → 32 → 10] or [48 → 24 → 10]</li>
-<li>Wider initial layers capture more complex feature interactions</li>
-<li>GPU memory constraints allow for this expansion</li>
-<li>Maintains gradual dimensionality reduction principle</li>
-</ul>
-</li>
-<li><p>Batch Size (currently 32)</p>
-<ul>
-<li>Try values: [64, 128]</li>
-<li>100k samples and 12GB GPU enable larger batches</li>
-<li>Could improve training stability</li>
-<li>May speed up convergence</li>
-</ul>
-</li>
-<li><p>Epochs (currently 50)</p>
-<ul>
-<li>Try values: [75, 100]</li>
-<li>Sub-10-minute training allows for more iterations</li>
-<li>Should be tuned last after other parameters</li>
-<li>Monitor validation loss to prevent overfitting</li>
+<li>Deeper architecture requires longer training vs previous version</li>
+<li>60-minute window allows sufficient epochs for temporal pattern learning</li>
+<li>Memory constraints influence convergence trade-offs</li>
 </ul>
 </li>
 </ul>
@@ -8030,21 +8017,14 @@ Model Device(s): {device(type='cpu')}
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Add this after loading the model</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">loaded_autoencoder</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
-    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found NaN in </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Number of NaN values: </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="Model-output-data">Model output data<a class="anchor-link" href="#Model-output-data">¶</a></h4><p>Now lets look at the actual outputs from the autoencoder and go over what they mean.</p>
 </div>
 </div>
 </div>
@@ -8053,13 +8033,11 @@ Model Device(s): {device(type='cpu')}
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1">#### Examine outputs</span>
-
-<span class="c1"># read in sample data</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s1">'../data/_09_autoencoder_training/results.parquet'</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Examine outputs</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s1">'../data/_11_analysis_conclusions/autoencoder_output_sample.parquet'</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"number of rows: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
@@ -8076,7 +8054,7 @@ Model Device(s): {device(type='cpu')}
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>number of rows: 1000000
+<pre>number of rows: 100
 </pre>
 </div>
 </div>
@@ -8126,124 +8104,124 @@ Model Device(s): {device(type='cpu')}
 </thead>
 <tbody>
 <tr>
-<th>0</th>
-<td>0.021274</td>
-<td>-2391.272217</td>
-<td>426.204803</td>
-<td>256.997345</td>
-<td>26619.986328</td>
-<td>-26.189440</td>
-<td>0.015159</td>
-<td>0.608051</td>
-<td>-103.790306</td>
-<td>9.001877e+06</td>
+<th>987231</th>
+<td>0.007142</td>
+<td>50.109253</td>
+<td>546.487183</td>
+<td>94.370583</td>
+<td>34493.812500</td>
+<td>-4.301480</td>
+<td>-0.116590</td>
+<td>0.684139</td>
+<td>-31.687557</td>
+<td>17424902.0</td>
 <td>...</td>
-<td>400537216.0</td>
-<td>-1286.003540</td>
-<td>311.033478</td>
-<td>280.729126</td>
-<td>11123.783203</td>
-<td>-0.198297</td>
-<td>-0.271256</td>
-<td>0.385261</td>
-<td>17.207180</td>
-<td>8776640</td>
+<td>765742720.0</td>
+<td>-51.899387</td>
+<td>547.978638</td>
+<td>72.161011</td>
+<td>35430.289062</td>
+<td>57.352501</td>
+<td>0.024926</td>
+<td>-0.333013</td>
+<td>-81.800285</td>
+<td>8592900</td>
 </tr>
 <tr>
-<th>1</th>
-<td>-0.027585</td>
-<td>1309.264160</td>
-<td>429.967102</td>
-<td>16.964352</td>
-<td>21088.099609</td>
-<td>41.075996</td>
-<td>-0.209062</td>
-<td>0.446521</td>
-<td>-16.958027</td>
-<td>1.199074e+07</td>
+<th>79954</th>
+<td>0.003918</td>
+<td>82.439018</td>
+<td>460.512634</td>
+<td>217.097153</td>
+<td>35535.257812</td>
+<td>6.474170</td>
+<td>0.088270</td>
+<td>0.007591</td>
+<td>20.345068</td>
+<td>7059239.0</td>
 <td>...</td>
-<td>750325632.0</td>
-<td>-928.983521</td>
-<td>456.485596</td>
-<td>-3.226900</td>
-<td>21995.623047</td>
-<td>21.134535</td>
-<td>0.320871</td>
-<td>0.253475</td>
-<td>-171.810287</td>
-<td>9406275</td>
+<td>639985984.0</td>
+<td>-110.646332</td>
+<td>464.905518</td>
+<td>210.165787</td>
+<td>35595.960938</td>
+<td>-3.423635</td>
+<td>-0.129447</td>
+<td>-0.084875</td>
+<td>-43.646847</td>
+<td>9125411</td>
 </tr>
 <tr>
-<th>2</th>
-<td>0.010562</td>
-<td>1091.447266</td>
-<td>189.254166</td>
-<td>222.599243</td>
-<td>-3218.409912</td>
-<td>22.040821</td>
-<td>0.470975</td>
-<td>0.090995</td>
-<td>-63.672363</td>
-<td>1.804085e+06</td>
+<th>567130</th>
+<td>0.007740</td>
+<td>637.542297</td>
+<td>91.083076</td>
+<td>95.346695</td>
+<td>245.131027</td>
+<td>2.802289</td>
+<td>-0.533764</td>
+<td>-0.150562</td>
+<td>-36.902733</td>
+<td>5696532.5</td>
 <td>...</td>
-<td>148401136.0</td>
-<td>1923.508545</td>
-<td>256.459290</td>
-<td>215.714081</td>
-<td>8521.358398</td>
-<td>-7.209484</td>
-<td>-0.086521</td>
-<td>-0.333846</td>
-<td>-47.320778</td>
-<td>9304767</td>
+<td>463879424.0</td>
+<td>91.232872</td>
+<td>109.719849</td>
+<td>53.798630</td>
+<td>3160.060547</td>
+<td>16.056448</td>
+<td>0.228994</td>
+<td>-0.235181</td>
+<td>-127.201141</td>
+<td>11826840</td>
 </tr>
 <tr>
-<th>3</th>
-<td>-0.000463</td>
-<td>95.263321</td>
-<td>462.243134</td>
-<td>155.262802</td>
-<td>34844.378906</td>
-<td>-25.224617</td>
-<td>-0.066722</td>
-<td>0.203521</td>
-<td>26.105040</td>
-<td>1.976829e+07</td>
+<th>500891</th>
+<td>0.006670</td>
+<td>-48.454681</td>
+<td>414.664429</td>
+<td>270.932648</td>
+<td>38325.113281</td>
+<td>-25.247885</td>
+<td>-0.099923</td>
+<td>0.151855</td>
+<td>4.844756</td>
+<td>18432414.0</td>
 <td>...</td>
-<td>806281152.0</td>
-<td>-296.389709</td>
-<td>454.934967</td>
-<td>145.074097</td>
-<td>32942.191406</td>
-<td>-17.680965</td>
-<td>-0.037470</td>
-<td>-0.131092</td>
-<td>-71.101250</td>
-<td>8865567</td>
+<td>869229888.0</td>
+<td>-95.528175</td>
+<td>412.022003</td>
+<td>283.591400</td>
+<td>38207.257812</td>
+<td>-20.732584</td>
+<td>-0.146490</td>
+<td>0.031765</td>
+<td>-38.067490</td>
+<td>8862811</td>
 </tr>
 <tr>
-<th>4</th>
-<td>0.010340</td>
-<td>36.086594</td>
-<td>98.401344</td>
-<td>8.072521</td>
-<td>1492.007935</td>
-<td>-9.836600</td>
-<td>-0.388105</td>
-<td>0.385285</td>
-<td>10.416059</td>
-<td>1.311079e+07</td>
+<th>55399</th>
+<td>0.026402</td>
+<td>161.986526</td>
+<td>116.810905</td>
+<td>62.545231</td>
+<td>3702.970947</td>
+<td>5.630402</td>
+<td>-0.747427</td>
+<td>0.962443</td>
+<td>-101.030655</td>
+<td>4920148.5</td>
 <td>...</td>
-<td>431435712.0</td>
-<td>-88.692192</td>
-<td>92.438080</td>
-<td>128.219528</td>
-<td>1321.861450</td>
-<td>-11.151931</td>
-<td>0.025553</td>
-<td>0.035737</td>
-<td>-127.268661</td>
-<td>11002401</td>
+<td>190356688.0</td>
+<td>135.428925</td>
+<td>119.363556</td>
+<td>238.775909</td>
+<td>4430.441406</td>
+<td>-74.548874</td>
+<td>-0.829505</td>
+<td>0.026354</td>
+<td>-86.863358</td>
+<td>10483710</td>
 </tr>
 </tbody>
 </table>
@@ -8260,78 +8238,152 @@ Model Device(s): {device(type='cpu')}
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="HDBScan">HDBScan<a class="anchor-link" href="#HDBScan">¶</a></h4><p>Hyperparameters Chosen</p>
 <ul>
-<li><p>Min Cluster Size (100)</p>
+<li><p>Understanding Autoencoder Output</p>
 <ul>
-<li>Currently represents ~0.1% of total dataset (100k samples)</li>
-<li>Initial choice targeted approximately 10 clusters</li>
-<li>Consider increasing to 250-500 for more robust clusters</li>
-<li>Larger clusters would better represent major flight patterns</li>
+<li>The output is a "reconstruction" of the input data</li>
+<li>Think of it like a very sophisticated game of "telephone":<ul>
+<li>The autoencoder first compresses the flight data (encoder)</li>
+<li>Then tries to recreate the original data from the compressed version (decoder)</li>
+<li>The output shows how well it recreated each detail</li>
 </ul>
 </li>
-<li><p>Min Samples (5)</p>
-<ul>
-<li>Conservative choice for noise detection</li>
-<li>Sufficient for statistical significance without being too restrictive</li>
-<li>Appropriate for normalized 10-dimensional space</li>
-<li>Balances between noise sensitivity and cluster stability</li>
+<li>Reconstruction error measures the difference between:<ul>
+<li>What went in (original flight pattern)</li>
+<li>What came out (reconstructed flight pattern)</li>
 </ul>
 </li>
-<li><p>Epsilon (0.1)</p>
-<ul>
-<li>Suitable for normalized data in 10-dimensional space</li>
-<li>Conservative choice for allowing cluster expansion</li>
-<li>Works well with normalized autoencoder outputs</li>
-<li>Prevents excessive cluster merging</li>
+<li>Large differences (high reconstruction error) suggest:<ul>
+<li>Unusual flight patterns</li>
+<li>Potential anomalies</li>
+<li>Patterns the model hasn't learned well</li>
 </ul>
 </li>
-<li><p>Euclidean Distance (metric choice)</p>
-<ul>
-<li>Natural choice for normalized, continuous flight data</li>
-<li>Performs well in moderate-dimensional spaces (10D)</li>
-<li>Computationally efficient for large datasets</li>
-<li>Intuitive distance measure for spatial patterns</li>
+<li>Small differences (low reconstruction error) suggest:<ul>
+<li>Common flight patterns</li>
+<li>Normal behavior</li>
+<li>Patterns similar to training data</li>
 </ul>
 </li>
-<li><p>EOM Cluster Selection</p>
+</ul>
+</li>
+<li><p>Input Structure (450 dimensions)</p>
 <ul>
-<li>Better than leaf for handling varying density clusters</li>
-<li>Well-suited for flight patterns that may have different densities</li>
+<li>9 flight parameters: time_offset, vertical_rate, ground_speed, heading, altitude, vertical_accel, ground_accel, turn_rate, climb_descent_accel</li>
+<li>Each parameter sampled across 50 sequential points (9 × 50 = 450 dimensions)</li>
+<li>Creates temporal sequence for learning flight trajectory patterns</li>
+<li>Input preserves chronological relationships in flight behavior</li>
+</ul>
+</li>
+<li><p>Data Preprocessing</p>
+<ul>
+<li>Input data drawn from global ADS-B flight traces</li>
+<li>Continuous traces segmented into 50-point sequences</li>
+<li>Each sequence represents a flight behavior pattern</li>
+<li>Parameters maintain original units and scaling</li>
+</ul>
+</li>
+<li><p>Architecture Purpose</p>
+<ul>
+<li>Pattern Recognition: Learn common flight trajectory patterns</li>
+<li>Anomaly Detection: Identify unusual flight behaviors</li>
+<li>Dimensionality Reduction: Compress 450D input into meaningful representation</li>
+<li>Sequence Analysis: Capture temporal patterns in flight data</li>
+</ul>
+</li>
+<li><p>Output Structure</p>
+<ul>
+<li>Matches input dimensionality (450D)</li>
+<li>Reconstructs full sequence of 50 timepoints</li>
+<li>Preserves all 9 original flight parameters</li>
+<li>Enables comparison between input and reconstructed patterns</li>
+</ul>
+</li>
+<li><p>Training Approach</p>
+<ul>
+<li>Uses full day of global flight data</li>
+<li>Learns from diverse flight patterns and behaviors</li>
+<li>Captures normal variations in flight trajectories</li>
+<li>Establishes baseline for anomaly detection</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="HDBSCAN">HDBSCAN<a class="anchor-link" href="#HDBSCAN">¶</a></h3><h4 id="Hyperparameters-Selection">Hyperparameters Selection<a class="anchor-link" href="#Hyperparameters-Selection">¶</a></h4><ul>
+<li><p>Min Cluster Size (35)</p>
+<ul>
+<li>Started at 100 (0.1% of original dataset)</li>
+<li>Experimented with extremes (10-100 range)</li>
+<li>Found sweet spot at 35 for 10k sample size</li>
+<li>Large enough to ensure statistical significance</li>
+<li>Small enough to capture distinct flight patterns</li>
+<li>Balances between over-fragmentation (87 clusters) and under-segmentation (3 clusters)</li>
+<li>Aligned with visible trajectory groupings in visualization</li>
+</ul>
+</li>
+<li><p>Min Samples (4)</p>
+<ul>
+<li>Started conservative at 5</li>
+<li>Tested range from 2 (too fragmented) to 8 (too merged)</li>
+<li>Provides sufficient statistical basis for core points</li>
+<li>Allows detection of natural trajectory groupings</li>
+<li>Controls noise without overly restricting cluster formation</li>
+<li>Works well with normalized high-dimensional flight data</li>
+</ul>
+</li>
+<li><p>Epsilon (0.25)</p>
+<ul>
+<li>Started conservative at 0.1</li>
+<li>Experimented between 0.1 and 0.4</li>
+<li>Accommodates spatial spread visible in 3D trajectory plots</li>
+<li>Handles normalized data in high-dimensional space</li>
+<li>Connects related trajectories without over-merging</li>
+<li>Balances cluster expansion with pattern distinction</li>
+</ul>
+</li>
+<li><p>Cluster Selection Method ('eom')</p>
+<ul>
+<li>Maintained 'eom' throughout process</li>
+<li>Well-suited for varying density clusters</li>
+<li>Handles flight patterns of different densities</li>
 <li>More robust to noise than alternative methods</li>
-<li>Good at finding clusters of varying sizes</li>
+<li>Provides stable cluster selection</li>
+</ul>
+</li>
+<li><p>Distance Metric (Euclidean)</p>
+<ul>
+<li>Natural choice for normalized continuous flight data</li>
+<li>Works well in high-dimensional spaces</li>
+<li>Computationally efficient for large datasets</li>
+<li>Appropriate for spatial trajectory patterns</li>
 </ul>
 </li>
 </ul>
-<p>Potential options for future research:</p>
+<h5 id="Supporting-Decisions">Supporting Decisions<a class="anchor-link" href="#Supporting-Decisions">¶</a></h5><ul>
+<li><p>Data Preprocessing</p>
 <ul>
-<li><p>Min Cluster Size (currently 100)</p>
-<ul>
-<li>Try values: [250, 500, 750]</li>
-<li>Larger clusters would better represent major flight patterns</li>
-<li>Could reduce noise sensitivity</li>
-<li>May identify more stable, interpretable patterns</li>
+<li>StandardScaler normalization</li>
+<li>Outlier removal using z-score method (3 standard deviations)</li>
+<li>10k sample size for computational efficiency</li>
+<li>Input data: 450 dimensions (9 flight parameters × 50 timepoints)</li>
 </ul>
 </li>
-<li><p>Min Samples (currently 5)</p>
+<li><p>Tuning Process</p>
 <ul>
-<li>Keep as is</li>
-<li>Well-tuned for current implementation</li>
-<li>Change only if noise sensitivity needs adjustment</li>
-</ul>
-</li>
-<li><p>Epsilon (currently 0.1)</p>
-<ul>
-<li>Keep as is</li>
-<li>Works well with normalized data</li>
-<li>Change only if cluster boundaries need adjustment</li>
-</ul>
-</li>
-<li><p>Alternative Metrics to Consider</p>
-<ul>
-<li>Cosine similarity for direction-based patterns</li>
-<li>Manhattan distance for computational efficiency</li>
-<li>Keep Euclidean as baseline</li>
+<li>Visualization-driven iteration</li>
+<li>Started conservative, tested extremes</li>
+<li>Found balance between cluster count and noise</li>
+<li>Used domain knowledge of flight patterns</li>
+<li>Iterative refinement based on trajectory visualization</li>
 </ul>
 </li>
 </ul>
@@ -8343,7 +8395,7 @@ Model Device(s): {device(type='cpu')}
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
@@ -8380,52 +8432,32 @@ Model Device(s): {device(type='cpu')}
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>Model Type: HDBSCAN
-Min Cluster Size: 10
+Min Cluster Size: 35
 Cluster Selection Method: eom
 
-Number of clusters: 20
-Number of noise points: 337
-Total points: 860
+Number of clusters: 10
+Number of noise points: 4916
+Total points: 10000
 
-Cluster 0 size: 15
+Cluster 0 size: 51
 
-Cluster 1 size: 41
+Cluster 1 size: 35
 
-Cluster 2 size: 29
+Cluster 2 size: 46
 
-Cluster 3 size: 33
+Cluster 3 size: 101
 
-Cluster 4 size: 17
+Cluster 4 size: 2803
 
-Cluster 5 size: 27
+Cluster 5 size: 56
 
-Cluster 6 size: 13
+Cluster 6 size: 35
 
-Cluster 7 size: 10
+Cluster 7 size: 41
 
-Cluster 8 size: 14
+Cluster 8 size: 138
 
-Cluster 9 size: 20
-
-Cluster 10 size: 30
-
-Cluster 11 size: 15
-
-Cluster 12 size: 25
-
-Cluster 13 size: 16
-
-Cluster 14 size: 11
-
-Cluster 15 size: 18
-
-Cluster 16 size: 15
-
-Cluster 17 size: 11
-
-Cluster 18 size: 36
-
-Cluster 19 size: 127
+Cluster 9 size: 1778
 </pre>
 </div>
 </div>
@@ -8436,7 +8468,7 @@ Cluster 19 size: 127
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1">#### Examine outputs</span>
@@ -8459,7 +8491,7 @@ Cluster 19 size: 127
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>number of rows: 21399
+<pre>number of rows: 10000
 </pre>
 </div>
 </div>
@@ -8497,32 +8529,32 @@ Cluster 19 size: 127
 </thead>
 <tbody>
 <tr>
-<th>10648263</th>
-<td>0</td>
+<th>8592900</th>
+<td>5</td>
 <td>False</td>
 <td>False</td>
 </tr>
 <tr>
-<th>9437118</th>
+<th>9125411</th>
 <td>-1</td>
 <td>False</td>
 <td>False</td>
 </tr>
 <tr>
-<th>10669532</th>
-<td>0</td>
+<th>11826840</th>
+<td>4</td>
 <td>False</td>
 <td>False</td>
 </tr>
 <tr>
-<th>10601579</th>
-<td>0</td>
+<th>8862811</th>
+<td>8</td>
 <td>False</td>
 <td>False</td>
 </tr>
 <tr>
-<th>11968445</th>
-<td>0</td>
+<th>10483710</th>
+<td>-1</td>
 <td>False</td>
 <td>False</td>
 </tr>
@@ -8540,16 +8572,11 @@ Cluster 19 size: 127
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>The outputs of our cluster model are much more intutive to interpret than the autoencoder output. For each segment ID we get a cluster label. It is actually possible to generate a ton of cool metrics using the clusters themselves. By looking at the number of points in a cluster, the centrality of 1 point with regard to the cluster centroid, and many more insights. But that is out of scope for today.</p>
+<p>What we are calculating, is the most "typical" and the most "extreme" trace within each cluster, and storing it to a boolean value. We define the calcualtions we use and the visualize the most typical and extreme traces in the next notebook.</p>
+<h4 id="Constraints">Constraints<a class="anchor-link" href="#Constraints">¶</a></h4><p>Up until this point I have been able to get over all compute and time restraints by utiliziation tools like connection pooling and parellelization. But with these models I have hit a will. For the autoencoder with GPU acceleration, I was able only able to process 100k rows before hitting system memory contraints. That said, running 45 million data pionts through a nueral network isn't that bad.</p>
+<p>For my HDSBCAN model, I am currently only able to do a sample of 25k rows. Trying to do a sample of 50k rows, it ran for 8 hours and still didn't complete. I was not able to get the GPU acceleration properly working for HDBSCAN due to dependancy issues.</p>
+<p>I will discuss more about what I woudl do in the future to resolve these constratints and increase my sample size at the end of the next notebook where I talk about ideas for futrue anaylsis.</p>
 </div>
 </div>
 </div>
