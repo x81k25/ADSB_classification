@@ -27,6 +27,7 @@ If you still want to get deeper and fully recreate this project, then keep readi
 ```
 .
 ├── data/              # Data files included with the repository
+├── docs/              # Contains all the assets needed to render the repo via Github Pages
 ├── notebooks/         # Jupyter notebooks for analysis and visualization
 ├── scripts/           # Python scripts for data pipeline
 ├── sql/               # SQL scripts for database setup
@@ -190,6 +191,10 @@ And the winner is: ...we're going with the Autoencoder + HDBSCAN combination bec
 Here I store the data required for the execution of the jupyter notebooks. The entirety of the data set used was big, for the largest table over 100 million rows was ingested. Most viewers of this repository are not going to want to wait around to process all that, so I have placed relevant aggregations, subsets, and objects in the data folder to speed everything up.
 
 Okay, if you really want all of the data, you recreate it entirely yourself. First, clear your schedule for a day or two, then go the Scripts section of the readme and follow the instructions.
+
+### data
+
+This directory simply holds all of the assets required to view the repo via Github Pages. The .ipynb files are convert to html via nbconvert. Directory also contains the html/javascript versions of the more complex plots.
 
 ### notebooks
 
