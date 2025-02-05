@@ -35,12 +35,13 @@ DATA_PATH = PROJECT_PATH / 'data'
 
 # Input paths
 CLUSTER_PATH = DATA_PATH / '_10_clustering' / 'results.parquet'
+AUTOENCODER_OUTPUT_PATH = DATA_PATH / '_09_autoencoder_training' / 'results.parquet'
 
 # Output paths
-OUTPUT_BASE_PATH = DATA_PATH / '_11_analysis_&_conclusions'
+OUTPUT_BASE_PATH = DATA_PATH / '_11_analysis_conclusions'
 TRAJECTORIES_PATH = OUTPUT_BASE_PATH / 'trajectories.parquet'
 AUTOENCODER_TRAINING_SAMPLE_PATH = OUTPUT_BASE_PATH / 'autoencoder_training_sample.parquet'
-
+AUTOENCODER_OUTPUT_SAMPLE_PATH = OUTPUT_BASE_PATH / 'autoencoder_output_sample.parquet'
 
 ################################################################################
 # global supporting functions
@@ -170,6 +171,17 @@ def get_trajectory_data(segment_ids: List[str]) -> pd.DataFrame:
     Raises:
         Exception: If query execution fails
     """
+    # Add debugging for input
+    logger.debug(f"Sample of first 5 segment IDs: {segment_ids[:5]}")
+
+    # Verification query
+    verify_query = """
+    SELECT COUNT(*) 
+    FROM autoencoder_training_unscaled 
+    WHERE segment_id = ANY(%s)
+    """
+
+    # Main trajectory query remains the same
     query = """
     WITH trajectory_points AS (
         SELECT 
@@ -230,14 +242,34 @@ def get_trajectory_data(segment_ids: List[str]) -> pd.DataFrame:
     conn = None
     try:
         conn = create_db_connection()
+
+        # First verify we have matching segments
         with conn.cursor() as cur:
-            logger.info(f"Executing trajectory query for {len(segment_ids)} segments")
+            logger.info(f"Verifying existence of {len(segment_ids)} segments")
+            cur.execute(verify_query, (segment_ids,))
+            count = cur.fetchone()[0]
+            logger.info(f"Found {count} matching segments in database")
+
+            if count == 0:
+                logger.warning(
+                    "No matching segments found - verify segment IDs")
+                return pd.DataFrame()
+
+        # If we have matches, proceed with main query
+        with conn.cursor() as cur:
+            logger.info(f"Executing trajectory query for {count} segments")
             cur.execute(query, (segment_ids,))
             columns = [desc[0] for desc in cur.description]
             results = cur.fetchall()
 
         df = pd.DataFrame(results, columns=columns)
-        logger.info(f"Retrieved {len(df)} trajectory points")
+        logger.info(
+            f"Retrieved {len(df)} trajectory points across {df['segment_id'].nunique()} segments")
+
+        if len(df) == 0:
+            logger.warning("Query executed but returned no data")
+            return df
+
         return optimize_datatypes(df)
 
     except Exception as e:
@@ -300,83 +332,114 @@ def get_autoencoder_training_sample(
             logger.debug("Database connection closed")
 
 
+def sample_autoencoder_output(
+    input_path: Path,
+    output_path: Path,
+    sample_size: int = 100,
+    random_seed: int = 42
+):
+    """
+    Read parquet file, take random sample, and write to new location.
+
+    Args:
+        input_path: Path to source parquet file
+        output_path: Path to destination parquet file
+        sample_size: Number of rows to sample (default 100)
+        random_seed: Random seed for reproducibility (default 42)
+    """
+    # Create output directory if it doesn't exist
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Read source file
+    df = pd.read_parquet(input_path)
+
+    # Take random sample
+    df_sample = df.sample(n=sample_size, random_state=random_seed)
+
+    # Write to destination
+    df_sample.to_parquet(output_path)
+
+    logger.info(f"Successfully sampled {sample_size} rows from {input_path}")
+    logger.info(f"Wrote output to {output_path}")
+
+
 ################################################################################
 # transform operations
 ################################################################################
 
 
 def rotate_points(group: pd.DataFrame) -> pd.DataFrame:
-	"""Rotate points in a segment to align with Y-axis (90 degrees).
+    """Rotate points in a segment to align with Y-axis (90 degrees).
 
-	Args:
-		group: DataFrame containing points for a single segment
+    Args:
+        group: DataFrame containing points for a single segment
 
-	Returns:
-		pd.DataFrame: DataFrame with rotated coordinates added
-	"""
-	target_angle = np.pi / 2
+    Returns:
+        pd.DataFrame: DataFrame with rotated coordinates added
+    """
+    target_angle = np.pi / 2
 
-	first_points = group.head(4)
-	dx = first_points['x'].to_numpy()[-1] - first_points['x'].to_numpy()[0]
-	dy = first_points['y'].to_numpy()[-1] - first_points['y'].to_numpy()[0]
-	initial_angle = np.arctan2(dy, dx)
+    first_points = group.head(4)
+    dx = first_points['x'].to_numpy()[-1] - first_points['x'].to_numpy()[0]
+    dy = first_points['y'].to_numpy()[-1] - first_points['y'].to_numpy()[0]
+    initial_angle = np.arctan2(dy, dx)
 
-	rotation_angle = target_angle - initial_angle
+    rotation_angle = target_angle - initial_angle
 
-	cos_theta = np.cos(rotation_angle)
-	sin_theta = np.sin(rotation_angle)
-	rotation_matrix = np.array([[cos_theta, -sin_theta],
-								[sin_theta, cos_theta]], dtype=np.float64)
+    cos_theta = np.cos(rotation_angle)
+    sin_theta = np.sin(rotation_angle)
+    rotation_matrix = np.array([[cos_theta, -sin_theta],
+                                [sin_theta, cos_theta]], dtype=np.float64)
 
-	points = np.column_stack((
-		group['x'].to_numpy(dtype=np.float64),
-		group['y'].to_numpy(dtype=np.float64)
-	))
+    points = np.column_stack((
+        group['x'].to_numpy(dtype=np.float64),
+        group['y'].to_numpy(dtype=np.float64)
+    ))
 
-	rotated_points = points @ rotation_matrix.T
+    rotated_points = points @ rotation_matrix.T
 
-	result = group.copy()
-	result['original_x'] = group['x'].to_numpy(dtype=np.float64)
-	result['original_y'] = group['y'].to_numpy(dtype=np.float64)
-	result['x'] = rotated_points[:, 0]
-	result['y'] = rotated_points[:, 1]
-	result['z'] = group['z'].to_numpy(dtype=np.float64)
+    result = group.copy()
+    result['original_x'] = group['x'].to_numpy(dtype=np.float64)
+    result['original_y'] = group['y'].to_numpy(dtype=np.float64)
+    result['x'] = rotated_points[:, 0]
+    result['y'] = rotated_points[:, 1]
+    result['z'] = group['z'].to_numpy(dtype=np.float64)
 
-	return result
+    return result
 
 
 def rotate_trajectories(df: pd.DataFrame) -> pd.DataFrame:
-	"""Transform trajectory data by rotating each segment to align with Y-axis.
+    """Transform trajectory data by rotating each segment to align with Y-axis.
 
-	Args:
-		df: Input DataFrame with trajectory coordinates
+    Args:
+        df: Input DataFrame with trajectory coordinates
 
-	Returns:
-		pd.DataFrame: DataFrame with rotated coordinates
-	"""
-	try:
-		logger.info("Starting trajectory rotation process")
-		df = df.copy()
-		df['x'] = df['x'].astype(np.float64)
-		df['y'] = df['y'].astype(np.float64)
-		df['z'] = df['z'].astype(np.float64)
+    Returns:
+        pd.DataFrame: DataFrame with rotated coordinates
+    """
+    try:
+        logger.info("Starting trajectory rotation process")
+        df = df.copy()
+        df['x'] = df['x'].astype(np.float64)
+        df['y'] = df['y'].astype(np.float64)
+        df['z'] = df['z'].astype(np.float64)
 
-		logger.info("Rotating trajectories to align with Y-axis")
-		with tqdm(total=len(df['segment_id'].unique()),
-				  desc="Rotating segments") as pbar:
-			rotated_df = df.groupby('segment_id', group_keys=False).apply(
-				lambda g: rotate_points(g))
-			pbar.update(1)
+        logger.info("Rotating trajectories to align with Y-axis")
+        with tqdm(total=len(df['segment_id'].unique()),
+                  desc="Rotating segments") as pbar:
+            rotated_df = df.groupby('segment_id', group_keys=False).apply(
+                lambda g: rotate_points(g))
+            pbar.update(1)
 
-		z_unchanged = np.allclose(df['z'].to_numpy(dtype=np.float64),
-								  rotated_df['z'].to_numpy(dtype=np.float64))
-		logger.info(f"Z coordinates preserved: {z_unchanged}")
+        z_unchanged = np.allclose(df['z'].to_numpy(dtype=np.float64),
+                                  rotated_df['z'].to_numpy(dtype=np.float64))
+        logger.info(f"Z coordinates preserved: {z_unchanged}")
 
-		return rotated_df
+        return rotated_df
 
-	except Exception as e:
-		logger.error(f"Error rotating trajectories: {str(e)}")
-		raise
+    except Exception as e:
+        logger.error(f"Error rotating trajectories: {str(e)}")
+        raise
 
 
 ################################################################################
@@ -385,49 +448,49 @@ def rotate_trajectories(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def merge_and_save_trajectories(
-	clustered_df: pd.DataFrame,
-	trajectories_df: pd.DataFrame,
-	output_path: Path = TRAJECTORIES_PATH
+    clustered_df: pd.DataFrame,
+    trajectories_df: pd.DataFrame,
+    output_path: Path = TRAJECTORIES_PATH
 ) -> pd.DataFrame:
-	"""Join clustered and trajectory data and save to parquet.
+    """Join clustered and trajectory data and save to parquet.
 
-	Args:
-		clustered_df: DataFrame containing clustering results
-		trajectories_df: DataFrame containing trajectory data
-		output_path: Path to save merged results
+    Args:
+        clustered_df: DataFrame containing clustering results
+        trajectories_df: DataFrame containing trajectory data
+        output_path: Path to save merged results
 
-	Returns:
-		pd.DataFrame: Merged DataFrame that was saved
+    Returns:
+        pd.DataFrame: Merged DataFrame that was saved
 
-	Raises:
-		ValueError: If DataFrames don't contain required columns or join produces unexpected rows
-	"""
-	try:
-		logger.info("Merging clustered and trajectory data")
+    Raises:
+        ValueError: If DataFrames don't contain required columns or join produces unexpected rows
+    """
+    try:
+        logger.info("Merging clustered and trajectory data")
 
-		if 'segment_id' not in clustered_df.columns or 'segment_id' not in trajectories_df.columns:
-			raise ValueError("Both DataFrames must contain 'segment_id' column")
+        if 'segment_id' not in clustered_df.columns or 'segment_id' not in trajectories_df.columns:
+            raise ValueError("Both DataFrames must contain 'segment_id' column")
 
-		joined_df = clustered_df.merge(
-			trajectories_df,
-			on='segment_id',
-			how='left'
-		)
+        joined_df = clustered_df.merge(
+            trajectories_df,
+            on='segment_id',
+            how='left'
+        )
 
-		expected_rows = len(clustered_df) * 50
-		if len(joined_df) != expected_rows:
-			raise ValueError(
-				f"Expected {expected_rows} rows after join (50 per cluster), but got {len(joined_df)}")
+        expected_rows = len(clustered_df) * 50
+        if len(joined_df) != expected_rows:
+            raise ValueError(
+                f"Expected {expected_rows} rows after join (50 per cluster), but got {len(joined_df)}")
 
-		output_path.parent.mkdir(parents=True, exist_ok=True)
-		joined_df.to_parquet(output_path, index=False)
-		logger.info(f"Saved merged trajectories to {output_path}")
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        joined_df.to_parquet(output_path, index=False)
+        logger.info(f"Saved merged trajectories to {output_path}")
 
-		return joined_df
+        return joined_df
 
-	except Exception as e:
-		logger.error(f"Error merging and saving trajectories: {str(e)}")
-		raise
+    except Exception as e:
+        logger.error(f"Error merging and saving trajectories: {str(e)}")
+        raise
 
 
 ################################################################################
@@ -436,58 +499,65 @@ def merge_and_save_trajectories(
 
 
 def run(
-	test_mode: bool = False,
-	sample_size: int = 100,
-	output_path: Optional[Path] = TRAJECTORIES_PATH,
-	autoencoder_sample_path: Optional[Path] = AUTOENCODER_TRAINING_SAMPLE_PATH
+    test_mode: bool = False,
+    sample_size: int = 100,
+    output_path: Optional[Path] = TRAJECTORIES_PATH,
+    autoencoder_sample_path: Optional[Path] = AUTOENCODER_TRAINING_SAMPLE_PATH
 ) -> bool:
-	"""Main execution function for trajectory analysis and processing.
+    """Main execution function for trajectory analysis and processing.
 
-	Args:
-		test_mode: If True, run with minimal data for testing
-		sample_size: Number of random samples to retrieve for autoencoder training
-		output_path: Path to save merged trajectory data. If None, skip saving
-		autoencoder_sample_path: Path to save autoencoder training samples. If None, skip saving
+    Args:
+        test_mode: If True, run with minimal data for testing
+        sample_size: Number of random samples to retrieve for autoencoder training
+        output_path: Path to save merged trajectory data. If None, skip saving
+        autoencoder_sample_path: Path to save autoencoder training samples. If None, skip saving
 
-	Returns:
-		bool: True if execution successful, False otherwise
-	"""
-	try:
-		if test_mode:
-			logger.setLevel(logging.DEBUG)
-			logger.info("Running in test mode with reduced sample size")
-			sample_size = min(sample_size, 10)
+    Returns:
+        bool: True if execution successful, False otherwise
+    """
+    try:
+        if test_mode:
+            logger.setLevel(logging.DEBUG)
+            logger.info("Running in test mode with reduced sample size")
+            sample_size = min(sample_size, 10)
 
-		# Get clustered data
-		logger.info("Starting trajectory processing pipeline")
-		clustered_df = get_clustered_data()
+        # Get clustered data
+        logger.info("Starting trajectory processing pipeline")
+        clustered_df = get_clustered_data()
 
-		# Process trajectories
-		logger.info("Retrieving and processing trajectory data")
-		trajectories_df = get_trajectory_data(list(clustered_df['segment_id']))
-		rotated_trajectories_df = rotate_trajectories(trajectories_df)
+        # Process trajectories
+        logger.info("Retrieving and processing trajectory data")
+        trajectories_df = get_trajectory_data(list(clustered_df['segment_id']))
+        rotated_trajectories_df = rotate_trajectories(trajectories_df)
 
-		# Save merged results
-		if output_path is not None:
-			merge_and_save_trajectories(
-				clustered_df,
-				rotated_trajectories_df,
-				output_path
-			)
+        # Save merged results
+        if output_path is not None:
+            merge_and_save_trajectories(
+                clustered_df,
+                rotated_trajectories_df,
+                output_path
+            )
 
-		# Get autoencoder training samples
-		logger.info("Retrieving autoencoder training samples")
-		get_autoencoder_training_sample(
-			sample_size=sample_size,
-			output_path=autoencoder_sample_path
-		)
+        # Get autoencoder training samples
+        logger.info("Retrieving autoencoder training samples")
+        get_autoencoder_training_sample(
+            sample_size=sample_size,
+            output_path=autoencoder_sample_path
+        )
 
-		logger.info("Processing completed successfully")
-		return True
+        # get autoencoder output sample
+        sample_autoencoder_output(
+            input_path=AUTOENCODER_OUTPUT_PATH,
+            output_path=AUTOENCODER_OUTPUT_SAMPLE_PATH
+        )
 
-	except Exception as e:
-		logger.error(f"Processing failed: {str(e)}")
-		return False
+        logger.info("Processing completed successfully")
+
+        return True
+
+    except Exception as e:
+        logger.error(f"Processing failed: {str(e)}")
+        return False
 
 
 ################################################################################
@@ -495,47 +565,47 @@ def run(
 ################################################################################
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(
-		description="Process trajectory data and prepare autoencoder training samples")
+    parser = argparse.ArgumentParser(
+        description="Process trajectory data and prepare autoencoder training samples")
 
-	parser.add_argument(
-		"--test",
-		"-t",
-		action="store_true",
-		help="Run in test mode with debug logging and minimal data"
-	)
+    parser.add_argument(
+        "--test",
+        "-t",
+        action="store_true",
+        help="Run in test mode with debug logging and minimal data"
+    )
 
-	parser.add_argument(
-		"--sample-size",
-		type=int,
-		default=100,
-		help="Number of random samples to retrieve for autoencoder training (default: 100)"
-	)
+    parser.add_argument(
+        "--sample-size",
+        type=int,
+        default=100,
+        help="Number of random samples to retrieve for autoencoder training (default: 100)"
+    )
 
-	parser.add_argument(
-		"--output-path",
-		type=Path,
-		default=TRAJECTORIES_PATH,
-		help="Path to save merged trajectory data"
-	)
+    parser.add_argument(
+        "--output-path",
+        type=Path,
+        default=TRAJECTORIES_PATH,
+        help="Path to save merged trajectory data"
+    )
 
-	parser.add_argument(
-		"--autoencoder-sample-path",
-		type=Path,
-		default=AUTOENCODER_TRAINING_SAMPLE_PATH,
-		help="Path to save autoencoder training samples"
-	)
+    parser.add_argument(
+        "--autoencoder-sample-path",
+        type=Path,
+        default=AUTOENCODER_TRAINING_SAMPLE_PATH,
+        help="Path to save autoencoder training samples"
+    )
 
-	args = parser.parse_args()
+    args = parser.parse_args()
 
-	success = run(
-		test_mode=args.test,
-		sample_size=args.sample_size,
-		output_path=args.output_path,
-		autoencoder_sample_path=args.autoencoder_sample_path
-	)
+    success = run(
+        test_mode=args.test,
+        sample_size=args.sample_size,
+        output_path=args.output_path,
+        autoencoder_sample_path=args.autoencoder_sample_path
+    )
 
-	exit(0 if success else 1)
+    exit(0 if success else 1)
 
 ################################################################################
 # end of trajectory_processor.py

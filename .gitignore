@@ -103,8 +103,6 @@ coverage.xml
 .pytest_cache/
 
 # Files used for development only
-config/
+dev/
 data/_09_autoencoder_training/results.parquet
 data/_10_clustering/results.parquet
-dev/
-Data_Analyst_assessment_FINAL.pdf

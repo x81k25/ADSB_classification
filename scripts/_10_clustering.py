@@ -32,9 +32,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Constants
-DEFAULT_MIN_CLUSTER_SIZE: int = 100
-DEFAULT_MIN_SAMPLES: int = 5
-DEFAULT_EPSILON: float = 0.1
+DEFAULT_MIN_CLUSTER_SIZE: int = 35
+DEFAULT_MIN_SAMPLES: int = 4
+DEFAULT_EPSILON: float = 0.25
 INPUT_PATH: str = 'data/reconstructed_df.pkl'
 OUTPUT_PATH: str = 'data/clustered_df.pkl'
 
@@ -83,33 +83,38 @@ def load_data(input_data_path: Path = input_data_path) -> pd.DataFrame:
 # clustering functions
 ################################################################################
 
-def preprocess_data(df: pd.DataFrame) -> Tuple[pd.DataFrame, StandardScaler]:
+def preprocess_data(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series, StandardScaler]:
     """
-    Preprocess the flight data by removing outliers and scaling.
-
-    Args:
-        df: Input DataFrame containing flight data
-
-    Returns:
-        Tuple containing:
-            - DataFrame with outliers removed and data scaled
-            - Fitted StandardScaler object
+    Modified preprocessing for high-dimensional flight data.
+    Returns features DataFrame, segment IDs series, and the fitted scaler.
     """
     logger.info("Preprocessing data - removing outliers and scaling")
 
-    # Remove outliers using z-score method (3 standard deviations)
-    z_scores = np.abs(stats.zscore(df))
-    df_no_outliers = df[(z_scores < 3).all(axis=1)]
-    logger.info(f"Removed {len(df) - len(df_no_outliers)} outliers")
+    # Store segment_id separately and ensure it's int
+    segment_ids = df['segment_id'].astype(int).copy()
 
-    # Normalize the data
-    scaler = StandardScaler()  # Remove the parameter - it's not needed here
-    df_scaled = pd.DataFrame(
+    # Remove segment_id before processing
+    df_features = df.drop('segment_id', axis=1)
+
+    # More lenient outlier removal (now only on feature columns)
+    z_scores = np.abs(stats.zscore(df_features))
+    df_no_outliers = df_features[
+        (z_scores < 4).all(axis=1)]  # Increased to 4 std deviations
+
+    # Keep corresponding segment_ids
+    valid_indices = df_features.index[
+        (z_scores < 4).all(axis=1)]
+    segment_ids = segment_ids[valid_indices].reset_index(drop=True)
+
+    # Normalize the features only
+    scaler = StandardScaler()
+    features_scaled = pd.DataFrame(
         scaler.fit_transform(df_no_outliers),
         columns=df_no_outliers.columns
     )
 
-    return df_no_outliers, scaler
+    # Return features and segment_ids separately
+    return features_scaled, segment_ids, scaler
 
 
 def cluster_flight_patterns(
@@ -122,20 +127,17 @@ def cluster_flight_patterns(
     Cluster flight patterns using HDBSCAN after preprocessing.
 
     Args:
-        df: DataFrame containing flight data
+        df: DataFrame containing flight feature data (without segment_ids)
         min_cluster_size: Minimum size of clusters
         min_samples: HDBSCAN min_samples parameter
         epsilon: Cluster selection epsilon parameter
 
     Returns:
         Tuple containing:
-            - Original dataframe with cluster labels
+            - DataFrame with feature data and cluster labels
             - Fitted HDBSCAN object
     """
     logger.info("Starting flight pattern clustering")
-
-    # Preprocess the data
-    df_no_outliers, _ = preprocess_data(df)
 
     # Initialize and fit HDBSCAN
     clusterer = hdbscan.HDBSCAN(
@@ -144,20 +146,15 @@ def cluster_flight_patterns(
         cluster_selection_epsilon=epsilon,
         metric='euclidean',
         cluster_selection_method='eom',
-        core_dist_n_jobs=-1  # Use all available cores for better performance
+        core_dist_n_jobs=-1
     )
 
     logger.info("Fitting HDBSCAN clusterer")
-    cluster_labels = clusterer.fit_predict(df_no_outliers)
+    cluster_labels = clusterer.fit_predict(df)
 
-    # Create a copy of the dataframe
-    df_with_clusters = df_no_outliers.copy()
-
-    # Get the position of 'segment_id' column
-    segment_id_position = df_no_outliers.columns.get_loc('segment_id')
-
-    # Insert the cluster column after segment_id
-    df_with_clusters.insert(segment_id_position + 1, 'cluster', cluster_labels)
+    # Create a copy of the dataframe and add cluster labels
+    df_with_clusters = df.copy()
+    df_with_clusters['cluster'] = cluster_labels
 
     # Log clustering statistics
     n_clusters = len(set(cluster_labels)) - (1 if -1 in cluster_labels else 0)
@@ -273,30 +270,44 @@ def process_cluster(cluster_id: int, df: pd.DataFrame,
 
     Args:
         cluster_id: ID of the cluster to process
-        df: Full DataFrame with cluster labels
+        df: DataFrame with feature data and cluster labels
         metric: Distance metric to use
 
     Returns:
         tuple: (cluster_id, typical_idx, extreme_idx) or None if error
     """
     try:
-        # Get cluster data (excluding metadata columns)
+        # Get cluster data (excluding cluster label)
         cluster_mask = df['cluster'] == cluster_id
-        cluster_data = df[cluster_mask].drop(['segment_id', 'cluster'], axis=1)
+
+        # Store the original indices before any processing
+        original_indices = df[cluster_mask].index.values
+
+        # Get cluster data and reset index for local processing
+        cluster_data = df[cluster_mask].drop(['cluster'], axis=1).reset_index(
+            drop=True)
 
         if len(cluster_data) < 2:
             logger.warning(
                 f"Cluster {cluster_id} has less than 2 points, skipping")
             return None
 
-        typical_idx = find_typical_point(cluster_data, metric)
-        extreme_idx = find_extreme_point(cluster_data, metric)
+        # Find typical and extreme points (these will return local indices)
+        typical_local_idx = find_typical_point(cluster_data, metric)
+        extreme_local_idx = find_extreme_point(cluster_data, metric)
+
+        # Map local indices back to original dataframe indices
+        typical_idx = original_indices[
+            typical_local_idx] if typical_local_idx is not None else None
+        extreme_idx = original_indices[
+            extreme_local_idx] if extreme_local_idx is not None else None
 
         return (cluster_id, typical_idx, extreme_idx)
 
     except Exception as e:
         logger.error(f"Error processing cluster {cluster_id}: {str(e)}")
         return None
+
 
 ################################################################################
 # main function
@@ -308,7 +319,7 @@ def run(
     epsilon: float = DEFAULT_EPSILON,
     metric: str = 'euclidean',
     test: bool = False,
-    max_sample_size: int = None  # New parameter
+    max_sample_size: int = None
 ) -> bool:
     """
     Main execution function for flight pattern clustering.
@@ -320,18 +331,32 @@ def run(
             min_cluster_size = 10
             min_samples = 2
             max_sample_size = 1000
+            epsilon = 0.3
 
-        # Load and cluster the data
+        # Load the data
         df = load_data()
+
+        # Store the segment_id separately and keep track of the original index
+        df = df.reset_index(drop=True)  # Ensure clean integer index
+        segment_ids = df['segment_id'].copy()
+        df = df.drop(columns=['segment_id'])
 
         # Apply max_sample_size if provided and not in test mode
         if not test and max_sample_size is not None and len(
             df) > max_sample_size:
             logger.info(
                 f"Sampling {max_sample_size} rows from {len(df)} total rows")
-            df = df.sample(max_sample_size)
+            # Use random state for reproducibility
+            df = df.sample(max_sample_size, random_state=42)
+            segment_ids = segment_ids.loc[df.index]
+            # Reset indices after sampling
+            df = df.reset_index(drop=True)
+            segment_ids = segment_ids.reset_index(drop=True)
         elif test and len(df) > max_sample_size:
-            df = df.sample(max_sample_size)
+            df = df.sample(max_sample_size, random_state=42)
+            segment_ids = segment_ids.loc[df.index]
+            df = df.reset_index(drop=True)
+            segment_ids = segment_ids.reset_index(drop=True)
 
         # Perform clustering
         df_with_clusters, clusterer = cluster_flight_patterns(
@@ -340,6 +365,11 @@ def run(
             min_samples=min_samples,
             epsilon=epsilon
         )
+
+        # save model object
+        model_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(model_path, 'wb') as f:
+            pickle.dump(clusterer, f)
 
         # Get unique clusters (excluding noise)
         unique_clusters = sorted(
@@ -360,13 +390,25 @@ def run(
                 desc="Finding cluster exemplars"
             ))
 
-        # Create final DataFrame with just the required columns
+        # Create final DataFrame with segment_ids reattached
         final_df = pd.DataFrame({
-            'segment_id': df_with_clusters['segment_id'],
+            'segment_id': segment_ids,
             'cluster': df_with_clusters['cluster'],
             'is_most_typical': False,
             'is_most_extreme': False
         })
+
+        # Verify segment_id integrity
+        logger.info("Verifying segment_id integrity...")
+        if len(final_df) != len(segment_ids):
+            raise ValueError(
+                "Length mismatch between final_df and original segment_ids")
+
+        # Add verification
+        if not np.issubdtype(final_df['segment_id'].dtype, np.integer):
+            logger.warning(
+                "segment_id was converted to float, forcing back to int")
+            final_df['segment_id'] = final_df['segment_id'].astype(int)
 
         # Update flags based on results
         for result in results:
@@ -401,6 +443,10 @@ def run(
         logger.error(f"Error in clustering process: {str(e)}")
         return False
 
+    except Exception as e:
+        logger.error(f"Error in clustering process: {str(e)}")
+        return False
+
 
 ################################################################################
 # script execution
@@ -430,7 +476,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--max-sample-size",
         type=int,
-        default=25000, #None,
+        default=10000, #None,
         help="Maximum number of samples to use for clustering (if None, uses all data)"
     )
     parser.add_argument(
