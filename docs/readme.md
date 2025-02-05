@@ -8,14 +8,12 @@ Hello, I'm so excited for you to be looking at my project! Let me show you aroun
 
 If you want to get a high level overview, you're in the right place, just keep reading.
 
-[Google](https://www.google.com)
-
 If you want to get a deeper understanding of the project then what is here, then you can jump straight to the notebooks by following these links: 
-- [Data Engineering & EDA](https://x81k25.github.io/ADSB_classification/blob/main/docs/01_data_engineering_EDA.html)
-- [Feature Engineeering](https://x81k25.github.io/ADSB_classification/blob/main/docs/02_feature_engineering.html)
-- [ML Pipeline](https://x81k25.github.io/ADSB_classification/blob/main/docs/03_ML_pipeline.html)
-- [Analyis & Conclusions](https://x81k25.github.io/ADSB_classification/blob/main/docs/04_analysis_conclusions.html)
- 
+- [Data Engineering & EDA](https://x81k25.github.io/ADSB_classification/01_data_engineering_EDA.html)
+- [Feature Engineeering](https://x81k25.github.io/ADSB_classification/02_feature_generation.html)
+- [ML Pipeline](https://x81k25.github.io/ADSB_classification/03_ML_pipeline.html)
+- [Analyis & Conclusions](https://x81k25.github.io/ADSB_classification/04_analysis_conclusions.html)
+
 Oh, that's not enough, you want to run the notebooks yourself? If you are accessing the file from github, the full repo can be found here:
 
 - [https://github.com/x81k25/ADSB_classification](https://github.com/x81k25/ADSB_classification)
